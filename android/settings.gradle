@@ -1,0 +1,3 @@
+rootProject.name = 'LBA_Mobile'
+
+include ':app'
