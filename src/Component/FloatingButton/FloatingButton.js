@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Icon } from 'native-base';
@@ -17,21 +16,13 @@ const FloatingButton = (props) => {
           }}
         >
           <Icon
-            style={{ fontSize: 40, }}
-            raised
-            reverse
-            name={props.icon || 'map'}
-            type="font-awesome"
+            style={{ fontSize: 40 }}
+            name={props.icon}
             color={buttonColor}
           /></View>
       </TouchableOpacity>
     </View>
   );
-};
-
-FloatingButton.propTypes = {
-  icon: PropTypes.string,
-  onPress: PropTypes.func,
 };
 
 export default FloatingButton;

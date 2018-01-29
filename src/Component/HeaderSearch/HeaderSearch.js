@@ -15,8 +15,9 @@ export default class Profile extends React.Component {
                     <Icon name="ios-list" />
                 </Item>
                 <Button transparent
+                    style={{backgroundColor: '#f2f2f2', height: height * 0.05,borderRadius:10,width: width * 0.25,marginLeft:7}}
                 >
-                    <Text style={{ color: '#0066ff' }} >Search</Text>
+                    <Text style={{ color: '#0066ff', alignItems:'center' }} >Search</Text>
                 </Button>
             </Header>
         );

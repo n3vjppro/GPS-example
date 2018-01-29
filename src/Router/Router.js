@@ -18,7 +18,6 @@ import Profile from '../Screen/Account/Profile';
 import Register from '../Screen/Account/Register';
 import SignIn from '../Screen/Account/SignIn';
 import SignOut from '../Screen/Account/SignOut';
-import styles from '../Component/FloatingButton/styles';
 
 export const HomeStack = StackNavigator({
     HomeMap: {
