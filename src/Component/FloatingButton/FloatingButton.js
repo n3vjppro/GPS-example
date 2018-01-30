@@ -1,24 +1,19 @@
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Icon } from 'native-base';
-import styles, { buttonColor } from './styles';
+import Styles from '../../StyleSheets/StyleFloatingButton';
 
 const FloatingButton = (props) => {
   return (
-    <View style={styles.container}>
+    <View style={Styles.container}>
       <TouchableOpacity
         onPress={props.onPress}>
         <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: 5
-          }}
+          style={Styles.IconCenter}
         >
           <Icon
-            style={{ fontSize: 40 }}
+            style={Styles.SizeIcon}
             name={props.icon}
-            color={buttonColor}
           /></View>
       </TouchableOpacity>
     </View>

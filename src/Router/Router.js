@@ -4,7 +4,7 @@ import TabBar from '../Component/TabBar/TabBar';
 //---------- Home
 import HomeList from '../Screen/Home/HomeList';
 import HomeMap from '../Screen/Home/HomeMap';
-import LocationDetail from '../Screen/LocationDetail';
+import LocationDetail from '../Screen/Detail/LocationDetail';
 //---------- Search
 import HeaderSearch from '../Component/HeaderSearch/HeaderSearch'
 import Search from '../Screen/Search/Search';
@@ -18,27 +18,28 @@ import Profile from '../Screen/Account/Profile';
 import Register from '../Screen/Account/Register';
 import SignIn from '../Screen/Account/SignIn';
 import SignOut from '../Screen/Account/SignOut';
+import Colors from '../Colors/Colors';
 
 export const HomeStack = StackNavigator({
     HomeMap: {
         screen: HomeMap,
         navigationOptions: {
             title: 'Home Map',
-            headerTintColor: '#0066ff',
+            headerTintColor: Colors.headerTintColor,
         },
     },
     HomeList: {
         screen: HomeList,
         navigationOptions: {
             title: 'Home List',
-            headerTintColor: '#0066ff',
+            headerTintColor: Colors.headerTintColor,
         },
     },
     LocationDetail: {
         screen: LocationDetail,
         navigationOptions: {
             title: 'Location Detail',
-            headerTintColor: '#0066ff',
+            headerTintColor: Colors.headerTintColor,
         }
     }
 });
@@ -54,7 +55,7 @@ export const SearchStack = StackNavigator({
         screen: LocationDetail,
         navigationOptions: {
             title: 'Location Detail',
-            headerTintColor: '#0066ff',
+            headerTintColor: Colors.headerTintColor,
         }
     }
 });
@@ -70,7 +71,7 @@ export const CameraArStack = StackNavigator({
         screen: LocationDetail,
         navigationOptions: {
             title: 'Location Detail',
-            headerTintColor: '#0066ff',
+            headerTintColor: Colors.headerTintColor,
         }
     }
 });
@@ -80,14 +81,14 @@ export const FavoriteStack = StackNavigator({
         screen: Favorite,
         navigationOptions: {
             title: 'Favorite',
-            headerTintColor: '#0066ff',
+            headerTintColor: Colors.headerTintColor,
         },
     },
     LocationDetail: {
         screen: LocationDetail,
         navigationOptions: {
             title: 'Location Detail',
-            headerTintColor: '#0066ff',
+            headerTintColor: Colors.headerTintColor,
         }
     }
 });
@@ -97,28 +98,28 @@ export const AccountStack = StackNavigator({
         screen: Authentication,
         navigationOptions: {
             title: 'Authentication',
-            headerTintColor: '#0066ff',
+            headerTintColor: Colors.headerTintColor,
         },
     },
     SignIn: {
         screen: SignIn,
         navigationOptions: {
             title: 'Sign In',
-            headerTintColor: '#0066ff',
+            headerTintColor: Colors.headerTintColor,
         },
     },
     SignOut: {
         screen: SignOut,
         navigationOptions: {
             title: 'Sign Up',
-            headerTintColor: '#0066ff',
+            headerTintColor: Colors.headerTintColor,
         },
     },
     Profile: {
         screen: Profile,
         navigationOptions: {
             title: 'Profile',
-            headerTintColor: '#0066ff',
+            headerTintColor: Colors.headerTintColor,
         },
     }
 });
