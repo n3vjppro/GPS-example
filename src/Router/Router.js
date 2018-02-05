@@ -3,11 +3,11 @@ import { StackNavigator, TabNavigator } from 'react-navigation';
 import TabBar from '../Component/TabBar/TabBar';
 //---------- Home
 import HomeList from '../Screen/Home/HomeList';
-import HomeMap from '../Screen/Home/HomeMap';
+import HomeMap from '../Redux/Containers/HomeMapContainer';
 import LocationDetail from '../Screen/Detail/LocationDetail';
 //---------- Search
-import HeaderSearch from '../Component/HeaderSearch/HeaderSearch'
-import Search from '../Screen/Search/Search';
+import HeaderSearch from '../Redux/Containers/HeaderSearchContainer'
+import Search from '../Redux/Containers/SearchContainer';
 //-----------CameraAR
 import CameraAr from '../Screen/CameraAR/CameraAr.js';
 //---------- Favorite

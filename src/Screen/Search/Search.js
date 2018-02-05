@@ -8,7 +8,7 @@ export default class Search extends React.Component {
                 <TouchableOpacity
                     onPress={()=>{this.props.navigation.navigate("LocationDetail")}}
                 >
-                    <Text>Search.js </Text>
+                    <Text>{this.props.textSearch}</Text>
                 </TouchableOpacity>
                 
             </View>

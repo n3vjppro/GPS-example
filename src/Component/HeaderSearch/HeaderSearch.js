@@ -5,6 +5,12 @@ import Colors from '../../Colors/Colors';
 import Style from '../../StyleSheets/StyleHeaderSearch';
 const { width, height } = Dimensions.get('window');
 export default class Profile extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+          textsearch:'',
+        };
+      }
     render() {
         return (
             <Header rounded
@@ -13,11 +19,15 @@ export default class Profile extends React.Component {
                 <Item style={Style.ItemSearch} >
                     <Icon name="ios-search" />
                     <Input placeholder="Search"
+                    onChangeText={text => this.setState({textsearch:text})}
                     />
                     <Icon name="ios-list" />
                 </Item>
                 <Button transparent
                     style={Style.ButtonSearch}
+                    onPress={() => {
+                        this.props.search(this.state.textsearch);
+                        }}
                 >
                     <Text style={Style.TextCenter} >Search</Text>
                 </Button>
