@@ -13,6 +13,6 @@ export default StyleSheet.create({
         alignItems: 'center',
     },
     IconCamera:{
-        fontSize: width * 0.10 
+        fontSize: width * 0.10
     }
 });

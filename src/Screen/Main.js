@@ -11,7 +11,7 @@ let store = createStore(allReducers);
 export default class Main extends React.Component {
   render() {
     return (
-      <Provider store = {store}>
+      <Provider store={store}>
         <Router />
       </Provider>
     );

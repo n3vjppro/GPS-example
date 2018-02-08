@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 const mapStateToProps = (state) => {
     return {
         latitude: state.mapReducers.latitude,
-        longitude: state.mapReducers.longitude
+        longitude: state.mapReducers.longitude,
+        directions: state.mapMarkerReducer.directions
     }
 }
 const mapDispatchToProps = (dispatch) => {

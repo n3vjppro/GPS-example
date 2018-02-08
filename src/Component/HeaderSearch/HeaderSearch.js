@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Text, Header, Item, Input, Icon } from 'native-base';
-import { Dimensions } from 'react-native';
+import { Dimensions, Keyboard } from 'react-native';
 import Colors from '../../Colors/Colors';
 import Style from '../../StyleSheets/StyleHeaderSearch';
 const { width, height } = Dimensions.get('window');
@@ -19,6 +19,7 @@ export default class Profile extends React.Component {
                 <Item style={Style.ItemSearch} >
                     <Icon name="ios-search" />
                     <Input placeholder="Search"
+                    onEndEditing={()=>{this.props.search(this.state.textsearch)}}
                     onChangeText={text => this.setState({textsearch:text})}
                     />
                     <Icon name="ios-list" />
@@ -27,6 +28,7 @@ export default class Profile extends React.Component {
                     style={Style.ButtonSearch}
                     onPress={() => {
                         this.props.search(this.state.textsearch);
+                        Keyboard.dismiss();
                         }}
                 >
                     <Text style={Style.TextCenter} >Search</Text>
