@@ -31,25 +31,56 @@ export default class MapMarker extends React.Component {
     }
 
     render() {
-        // alert(this.props.latitude);
         imageLocation = require("../../Images/LocationNomal.png");
         return (
-            <MapView.Marker
-                // key={item.ID_promotion}
-                coordinate={{
-                    latitude: 16.0538858,
-                    longitude: 108.2178565,
-                }}
-                image={imageLocation}
-                onPress={() => {
-                    this.getDirections(this.props.latitude + ","
-                        + this.props.longitude, "16.0538858,108.2178565");
+            <View>
+                <MapView.Marker
+                    key={'0'}
+                    coordinate={{
+                        latitude: 16.0538858,
+                        longitude: 108.2178565,
+                    }}
+                    image={imageLocation}
+                    onPress={() => {
+                        this.getDirections(this.props.latitude + ","
+                            + this.props.longitude, "16.0538858,108.2178565");
 
 
-                }}
-            >
-                {/* {this.renderViewMapCallout(item)} */}
-            </MapView.Marker>
+                    }}
+                >
+                    {/* {this.renderViewMapCallout(item)} */}
+                </MapView.Marker>
+                <MapView.Marker
+                    key={'1'}
+                    coordinate={{
+                        latitude: 16.03243163,
+                        longitude: 108.21876769,
+                    }}
+                    image={imageLocation}
+                    onPress={() => {
+                        this.getDirections(this.props.latitude + ","
+                            + this.props.longitude, "16.03243163,108.21876769");
+                    }}
+                >
+                    {/* {this.renderViewMapCallout(item)} */}
+                </MapView.Marker>
+                <MapView.Marker
+                    key={'2'}
+                    coordinate={{
+                        latitude: 16.03104395,
+                        longitude: 108.202223
+                    }}
+                    image={imageLocation}
+                    onPress={() => {
+                        this.getDirections(this.props.latitude + ","
+                            + this.props.longitude, "16.03104395,108.202223");
+
+
+                    }}
+                >
+                    {/* {this.renderViewMapCallout(item)} */}
+                </MapView.Marker>
+            </View>
         );
     }
 }

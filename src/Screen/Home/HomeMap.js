@@ -1,13 +1,29 @@
 import React from 'react';
-import { Text, View, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import {
+    AppRegistry,
+    StyleSheet,
+    Text,
+    View,
+    ScrollView,
+    Animated,
+    Image,
+    Dimensions,
+    TouchableOpacity,
+} from 'react-native';
+import { Icon } from 'native-base';
 import MapView from "react-native-maps";
 import FloatingButton from '../../Component/FloatingButton/index';
 import MapMarker from '../../Redux/Containers/MapMarkerContainer';
+
 const { width, height } = Dimensions.get("window");
+
 const ASPECT_RATIO = width / height;
 
-
 export default class HomeMap extends React.Component {
+    constructor() {
+        super()
+        this.mapRef = null;
+    }
     componentDidMount() {
         this.watchId = navigator.geolocation.watchPosition(
             position => {
@@ -24,6 +40,7 @@ export default class HomeMap extends React.Component {
                 distanceFilter: 10
             }
         );
+       
     }
     componentWillUnmount() {
         navigator.geolocation.clearWatch(this.watchId);
@@ -33,16 +50,12 @@ export default class HomeMap extends React.Component {
         return (
             <View style={{ flex: 1 }} >
                 <MapView
+                    ref={(ref) => { this.mapRef = ref }}
                     style={{
                         ...StyleSheet.absoluteFillObject
                     }}
-                    region={{
-                        longitude: this.props.longitude,
-                        latitude: this.props.latitude,
-                        longitudeDelta: 0.012,
-                        latitudeDelta: 0.012 * ASPECT_RATIO
-                    }}
                     showsUserLocation
+                    onLayout={()=> this.mapRef.fitToElements(true)}
                 >
                     <MapMarker />
                     <MapView.Polyline

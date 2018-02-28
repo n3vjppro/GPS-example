@@ -6,13 +6,13 @@ export default StyleSheet.create({
         fontSize: 10
     },
     TabBar: {
-        backgroundColor: Colors.TabBarColor
+        backgroundColor: Colors.TabBarColor,
     },
     CameraAR: {
         height: width * 0.12, width: width * 0.12, borderRadius: width * 0.06, backgroundColor: Colors.CycleCameraColor, justifyContent: 'center',
         alignItems: 'center',
     },
     IconCamera:{
-        fontSize: width * 0.10
+        fontSize: width * 0.10 
     }
 });

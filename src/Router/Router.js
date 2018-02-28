@@ -1,5 +1,5 @@
 import React from 'react';
-import { StackNavigator, TabNavigator } from 'react-navigation';
+import { StackNavigator, TabNavigator, DrawerNavigator } from 'react-navigation';
 import TabBar from '../Component/TabBar/TabBar';
 //---------- Home
 import HomeList from '../Screen/Home/HomeList';
@@ -20,12 +20,15 @@ import SignIn from '../Screen/Account/SignIn';
 import SignOut from '../Screen/Account/SignOut';
 import Colors from '../Colors/Colors';
 
+import Notifications from '../Screen/Notification/Notification'
+
+import { View } from 'react-native';
+
 export const HomeStack = StackNavigator({
     HomeMap: {
         screen: HomeMap,
         navigationOptions: {
-            title: 'Home Map',
-            headerTintColor: Colors.headerTintColor,
+            header: null
         },
     },
     HomeList: {
@@ -93,6 +96,23 @@ export const FavoriteStack = StackNavigator({
     }
 });
 
+export const NotificationStack = StackNavigator({
+    Notification: {
+        screen: Notifications,
+        navigationOptions: {
+            title: 'Notification',
+            headerTintColor: Colors.headerTintColor,
+        },
+    },
+    LocationDetail: {
+        screen: LocationDetail,
+        navigationOptions: {
+            title: 'Location Detail',
+            headerTintColor: Colors.headerTintColor,
+        }
+    }
+});
+
 export const AccountStack = StackNavigator({
     Authentication: {
         screen: Authentication,
@@ -127,10 +147,10 @@ export const AccountStack = StackNavigator({
 export const HomeScreenRouter = TabNavigator(
     {
         Home: { screen: HomeStack, },
-        Searchs: { screen: SearchStack },
+        Notifications: { screen: NotificationStack },
         CameraArs: { screen: CameraArStack },
         Favorites: { screen: FavoriteStack },
-        Account: { screen: AccountStack }
+        Accounts: { screen: AccountStack }
     },
     {
         tabBarPosition: "bottom",
@@ -142,4 +162,5 @@ export const HomeScreenRouter = TabNavigator(
         }
     }
 );
+
 export default HomeScreenRouter;
