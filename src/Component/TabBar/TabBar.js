@@ -17,7 +17,7 @@ export default class TabBar extends React.Component {
                         onPress={() => this.props.navigation.navigate("Home")}>
                         <Icon name={(this.props.navigationState.index == 0) ? "ios-home" : "ios-home-outline"} />
                     </Button>
-                    <Button
+                    {/* <Button
                         style={{ backgroundColor: '#ffffff' }}
                         vertical
                         active={this.props.navigationState.index === 1}
@@ -46,7 +46,7 @@ export default class TabBar extends React.Component {
                         active={this.props.navigationState.index === 4}
                         onPress={() => this.props.navigation.navigate("Accounts")}>
                         <Icon name={(this.props.navigationState.index == 4) ? "ios-person" : "ios-person-outline"} />
-                    </Button>
+                    </Button> */}
                 </FooterTab>
             </Footer>
         );
