@@ -51,6 +51,8 @@
 		8FF7175FB5B54AA08E52A60C /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 159B89D228AC4A17BA8DD6AD /* SimpleLineIcons.ttf */; };
 		6B345DFEE0F148B3A39ADAE2 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 66F62EB5F31D4027AAC5A650 /* Zocial.ttf */; };
 		6F0499A2B217463BAF75B24A /* libRNGooglePlaces.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 884C2276ACEB4E8F94911085 /* libRNGooglePlaces.a */; };
+		E22CCC9A72A74873A7BE15D1 /* libRCTFBSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C869A286C8EA493C955BCCEB /* libRCTFBSDK.a */; };
+		D9C062ED3E49484C8AFB032A /* libRCTFBLogin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A143B6EDEA3E4A6AA5CC2443 /* libRCTFBLogin.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -318,6 +320,10 @@
 		66F62EB5F31D4027AAC5A650 /* Zocial.ttf */ = {isa = PBXFileReference; name = "Zocial.ttf"; path = "../node_modules/native-base/Fonts/Zocial.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		5E0D4B97469F4C948B13D030 /* RNGooglePlaces.xcodeproj */ = {isa = PBXFileReference; name = "RNGooglePlaces.xcodeproj"; path = "../node_modules/react-native-google-places/ios/RNGooglePlaces.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		884C2276ACEB4E8F94911085 /* libRNGooglePlaces.a */ = {isa = PBXFileReference; name = "libRNGooglePlaces.a"; path = "libRNGooglePlaces.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		4C14D2B2AFA94BC88DD083E1 /* RCTFBSDK.xcodeproj */ = {isa = PBXFileReference; name = "RCTFBSDK.xcodeproj"; path = "../node_modules/react-native-fbsdk/ios/RCTFBSDK.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		C869A286C8EA493C955BCCEB /* libRCTFBSDK.a */ = {isa = PBXFileReference; name = "libRCTFBSDK.a"; path = "libRCTFBSDK.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		C39938FAF1F145C987FE047A /* RCTFBLogin.xcodeproj */ = {isa = PBXFileReference; name = "RCTFBLogin.xcodeproj"; path = "../node_modules/react-native-facebook-login/RCTFBLogin.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		A143B6EDEA3E4A6AA5CC2443 /* libRCTFBLogin.a */ = {isa = PBXFileReference; name = "libRCTFBLogin.a"; path = "libRCTFBLogin.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -349,6 +355,8 @@
 				EC1821BE0B954D77917DC317 /* libRCTCamera.a in Frameworks */,
 				04A10AD0B61047DD83380B83 /* libAirMaps.a in Frameworks */,
 				6F0499A2B217463BAF75B24A /* libRNGooglePlaces.a in Frameworks */,
+				E22CCC9A72A74873A7BE15D1 /* libRCTFBSDK.a in Frameworks */,
+				D9C062ED3E49484C8AFB032A /* libRCTFBLogin.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -529,6 +537,8 @@
 				CF80DC810D7248B3988FD847 /* RCTCamera.xcodeproj */,
 				0A9B30FCD180460E887A60DF /* AirMaps.xcodeproj */,
 				5E0D4B97469F4C948B13D030 /* RNGooglePlaces.xcodeproj */,
+				4C14D2B2AFA94BC88DD083E1 /* RCTFBSDK.xcodeproj */,
+				C39938FAF1F145C987FE047A /* RCTFBLogin.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1135,12 +1145,16 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
+					"$(SRCROOT)/../node_modules/react-native-facebook-login/RCTFBLogin/**",
 				);
 			};
 			name = Debug;
@@ -1164,12 +1178,16 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
+					"$(SRCROOT)/../node_modules/react-native-facebook-login/RCTFBLogin/**",
 				);
 			};
 			name = Release;
@@ -1194,6 +1212,8 @@
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
+					"$(SRCROOT)/../node_modules/react-native-facebook-login/RCTFBLogin/**",
 				);
 			};
 			name = Debug;
@@ -1217,6 +1237,8 @@
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
+					"$(SRCROOT)/../node_modules/react-native-facebook-login/RCTFBLogin/**",
 				);
 			};
 			name = Release;
@@ -1249,12 +1271,16 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
+					"$(SRCROOT)/../node_modules/react-native-facebook-login/RCTFBLogin/**",
 				);
 			};
 			name = Debug;
@@ -1287,12 +1313,16 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-fbsdk/ios/RCTFBSDK/**",
+					"$(SRCROOT)/../node_modules/react-native-facebook-login/RCTFBLogin/**",
 				);
 			};
 			name = Release;
@@ -1320,6 +1350,8 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 			};
 			name = Debug;
@@ -1344,6 +1376,8 @@
 				TVOS_DEPLOYMENT_TARGET = 10.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
