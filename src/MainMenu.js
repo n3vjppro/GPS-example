@@ -4,6 +4,7 @@ import { TabNavigator } from 'react-navigation';
 import { Icon } from 'native-base';
 import DisplayMap from '../src/Components/Maps/DisplayMap'
 import SettingTab from '../src/Components/Setting/SettingTab'
+import MyTimeLine from '../src/Components/Maps/MyTimeLine'
 
 export  class MainMenu extends Component {
     static navigationOptions = {
@@ -31,7 +32,9 @@ export default MainNavigator = TabNavigator({
     SettingTab: {
         screen: SettingTab
     },
-   
+    MyTimeLine:{
+        screen: MyTimeLine
+    }
 }, {
         animationEnabled: true,
         swipeEnabled: true,

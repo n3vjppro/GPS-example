@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, PermissionsAndroid } from 'react-native';
+import { StyleSheet, Text, View, PermissionsAndroid, TouchableOpacity, AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import { Icon } from 'native-base'
 import MapView from 'react-native-maps'
@@ -33,36 +33,37 @@ export default class DisplayMap extends Component {
       (position) => {
         //this.setState({latitude:position.coords.latitude, longitude:position.coords.longitude})
         console.log(position);
-        alert('lat: '+position.coords.latitude+' long: '+position.coords.longitude)
+        alert('lat: ' + position.coords.latitude + ' long: ' + position.coords.longitude)
       },
       (error) => console.log(new Date(), error),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
     );
 
     let watchID = navigator.geolocation.watchPosition((position) => {
-      let distance=0;
-      if(this.state.preCoords){
-        distance= this.state.distance + haversine(this.state.preCoords, position.coords,{unit:'meter'}),
-        this.setState({distance: distance})
+      let distance = 0;
+      if (this.state.preCoords) {
+        distance = this.state.distance + haversine(this.state.preCoords, position.coords, { unit: 'meter' }),
+          this.setState({ distance: distance })
       }
 
-      let x= position.coords.heading;
-      if((x>0&&x<=23)||(x>338 && x<=360))
-        this.setState({direction:'N'});
-      else if((x>23 && x<=65))
-      this.setState({direction:'NE'});
-      else if((x>65 && x<=110))
-      this.setState({direction:'E'});
-      else if((x>110 && x<=155))
-      this.setState({direction:'SE'});
-      else if((x>155 && x<=203))
-      this.setState({direction:'S'});
-      else if((x>203 && x<=248))
-      this.setState({direction:'SW'});
-      else if((x>248 && x<=293))
-      this.setState({direction:'W'});
-      else if((x>293 && x<=338))
-      this.setState({direction:'NW'});
+      let x = position.coords.heading;
+      if ((x > 0 && x <= 23) || (x > 338 && x <= 360))
+        this.setState({ direction: 'N' });
+      else if ((x > 23 && x <= 65))
+        this.setState({ direction: 'NE' });
+      else if ((x > 65 && x <= 110))
+        this.setState({ direction: 'E' });
+      else if ((x > 110 && x <= 155))
+        this.setState({ direction: 'SE' });
+      else if ((x > 155 && x <= 203))
+        this.setState({ direction: 'S' });
+      else if ((x > 203 && x <= 248))
+        this.setState({ direction: 'SW' });
+      else if ((x > 248 && x <= 293))
+        this.setState({ direction: 'W' });
+      else if ((x > 293 && x <= 338))
+        this.setState({ direction: 'NW' });
+      this.postLocation('2', position.coords.latitude, position.coords.longitude, position.timestamp);
 
       this.setState({
         markers: [
@@ -74,7 +75,7 @@ export default class DisplayMap extends Component {
         preCoords: position.coords,
         distance
 
-      }, null, { distanceFiler: 10 }
+      }, null, { distanceFiler: 5 }
       ),
         this.setState({
           latitude: position.coords.latitude,
@@ -87,33 +88,52 @@ export default class DisplayMap extends Component {
     );
     this.state = { markers: [], watchID }
   }
-  async addMarker(region) {
-    let now = (new Date).getTime();
-    if (this.state.ladAddedMarker > now - 5000) { return; }
-    this.setState({
-      markers: [
-        ...this.state.markers, {
-          coordinate: region,
-          key: id++
-        }
-      ],
-      ladAddedMarker: now
-    });
 
-    fetch('http://192.168.21.7:8001/api/location', {
+  postLocation(userid, latitude, longitude, LastUpdate) {
+    var d = new Date();
+    var tzoffset = (new Date()).getTimezoneOffset() * 60000;
+    var n = new Date(d-tzoffset).toISOString().slice(0, 19).replace('T', ' ');
+    console.log('fetch', n)
+    fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location', {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-        'Token': 'vjJZjABwEjPfT9KGmxelkp3CYEgsTJjVrPnRbWRWHTe4Ddy_4O26dqIfqgbQuiO6a4ZeW4EBRsPBl__UfgzeSnSahh1'
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'token': 'vjJZjABwEjPfT9KGmxelkp3CYEgsTJjVrPnRbWRWHTe4Ddy_4O26dqIfqgbQuiO6a4ZeW4EBRsPBl__UfgzeSnSahh1'
       },
-      body: {
-        userid: '2',
-        latitude: this.state.latitude,
-        longitude: this.state.longitude,
-      },
-    }).then(console.log('success')).catch((err) => console.log(err));
+      body: JSON.stringify({
+        userid: userid,
+        latitude: latitude,
+        longtitude: longitude,
+        LastUpdate: n,
+      }),
+
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+
+        console.log(responseJson)
+      })
+      .catch((error) => {
+
+        console.log(error);
+      })
+
   }
+
+  // async addMarker(region) {
+  //   let now = (new Date).getTime();
+  //   if (this.state.ladAddedMarker > now - 5000) { return; }
+  //   this.setState({
+  //     markers: [
+  //       ...this.state.markers, {
+  //         coordinate: region,
+  //         key: id++
+  //       }
+  //     ],
+  //     ladAddedMarker: now
+  //   });
+  // }
 
   render() {
     return (
@@ -135,7 +155,7 @@ export default class DisplayMap extends Component {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.titleText}>Speed</Text>
-            <Text style={styles.detailText}>{parseFloat(this.state.speed*3.6).toFixed(2) + ' km/h'}</Text>
+            <Text style={styles.detailText}>{parseFloat(this.state.speed * 3.6).toFixed(2) + ' km/h'}</Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.titleText}>Direct</Text>
@@ -164,12 +184,14 @@ export default class DisplayMap extends Component {
           //onRegionChange={(region)=>this.addMarker(region)}
 
           >
-            {this.state.markers.map((marker) => (
-              <MapView.Marker coordinate={marker.coordinate} key={marker.key} />
-            ))}
+            <MapView.Polyline
+              coordinates={this.state.markers.map((marker) => (marker.coordinate))}
+              strokeWidth={4}
+              strokeColor='#428bca'
+            />
           </MapView>
         </View>
-        
+       
       </View>
     );
   }

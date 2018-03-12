@@ -16,6 +16,7 @@
     "react-native-facebook-login": "^1.6.0",
     "react-native-fbsdk": "^0.7.0",
     "react-native-maps": "^0.19.0",
+    "react-native-modal-datetime-picker": "^4.13.0",
     "react-navigation": "^1.4.0",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",

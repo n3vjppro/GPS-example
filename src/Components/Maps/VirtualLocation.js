@@ -46,6 +46,7 @@ export default class VirtualLocation extends Component {
                     <Text style={styles.titleText}>Direct</Text>
                     <Text style={styles.detailText}>{this.state.direction}</Text>
                 </View>
+                
             </View>
         );
     }
