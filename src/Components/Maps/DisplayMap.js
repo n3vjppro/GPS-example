@@ -89,12 +89,26 @@ export default class DisplayMap extends Component {
     this.state = { markers: [], watchID }
   }
 
-  postLocation(userid, latitude, longitude, LastUpdate) {
+  async postLocation(userid, latitude, longitude, LastUpdate) {
     var d = new Date();
     var tzoffset = (new Date()).getTimezoneOffset() * 60000;
-    var n = new Date(d-tzoffset).toISOString().slice(0, 19).replace('T', ' ');
+    var n = new Date(d - tzoffset).toISOString().slice(0, 19).replace('T', ' ');
     console.log('fetch', n)
-    fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location', {
+    var des=''
+    let latlng = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&sensor=true&key=AIzaSyBAKmIRhHy16oixr-Suxus0p7fkZqs2e7w"
+    await fetch(latlng).then((response) => response.json())
+      .then((responseJson) => {
+        // this.setState({ markerInfor: responseJson.results[0].formatted_address })
+        // console.log(this.state.markerInfor)
+        des = responseJson.results[0].formatted_address
+        console.log(des)
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+
+
+    await fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -106,6 +120,7 @@ export default class DisplayMap extends Component {
         latitude: latitude,
         longtitude: longitude,
         LastUpdate: n,
+        Description:des
       }),
 
     })
@@ -191,7 +206,7 @@ export default class DisplayMap extends Component {
             />
           </MapView>
         </View>
-       
+
       </View>
     );
   }

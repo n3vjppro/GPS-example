@@ -29,12 +29,13 @@ export default MainNavigator = TabNavigator({
     DisplayMapTab: {
         screen: DisplayMap
     },
+    MyTimeLine:{
+        screen: MyTimeLine
+    },
     SettingTab: {
         screen: SettingTab
     },
-    MyTimeLine:{
-        screen: MyTimeLine
-    }
+    
 }, {
         animationEnabled: true,
         swipeEnabled: true,

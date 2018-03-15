@@ -3,17 +3,33 @@ import {
     StyleSheet, Text, View, PermissionsAndroid,
     TouchableWithoutFeedback, StatusBar,
     TextInput, SafeAreaView, Keyboard, TouchableOpacity,
-    KeyboardAvoidingView, Image,
+    KeyboardAvoidingView, Image, Dimensions, AsyncStorage
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import FBSDK, { LoginManager } from 'react-native-fbsdk'
 import MainMenu from '../../MainMenu'
-
+const deviceHeight = Dimensions.get("window").height;
+const deviceWidth = Dimensions.get("window").width;
 const {
     LoginButton,
     AccessToken
 } = FBSDK;
-export class Login extends Component {
+
+export default class Login extends Component {
+    constructor(props) {
+        super(props);
+        
+        
+        try {
+            const token =  AsyncStorage.getItem('token');
+            if (token !== null) {
+                // We have data!!
+                this.state = { screen: 'MainMenu' }
+            }else this.state = { screen: 'Login' }
+        } catch (error) {
+            // Error retrieving data
+        }
+    }
     static navigationOptions = {
 
         header: null
@@ -34,81 +50,121 @@ export class Login extends Component {
     //         }
     //     );
     // }
+
+
+    async checkAuth(email, password) {
+        await fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/login', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                Email: email,
+                PassWord: password
+            }),
+
+        })
+            .then((response) => response.json())
+            .then((responseJson) => {
+                if (responseJson.success)
+                    try {
+                        AsyncStorage.setItem('token', responseJson.token);
+                        console.log('success')
+                        this.setState({ screen: 'MainMenu' })
+                        // return <MainMenu />
+                    } catch (error) {
+                        // Error saving data
+                    }
+                else alert('Email or Password invalid')
+                console.log(responseJson)
+            })
+            .catch((error) => {
+                AsyncStorage.setItem('token', null);
+
+                console.log(error);
+            })
+    }
+
+     
     render() {
+        let username = ''
+        let password = ''
         return (
-             AccessToken.getCurrentAccessToken() === null ?
-
-
-                <View style={styles.container}>
-                    <StatusBar barStyle="light-content" />
-                    <KeyboardAvoidingView behavior='padding' style={styles.container}>
-                        <TouchableWithoutFeedback style={styles.container}
-                            onPress={Keyboard.dismiss}>
+            //  AccessToken.getCurrentAccessToken() === null ?
+            this.state.screen==='Login'?
+            <View style={styles.container}>
+                <StatusBar barStyle="light-content" />
+                <KeyboardAvoidingView behavior='padding' style={styles.container}>
+                    <TouchableWithoutFeedback style={styles.container}
+                        onPress={Keyboard.dismiss}>
+                        <View style={styles.logoContainer}>
                             <View style={styles.logoContainer}>
-                                <View style={styles.logoContainer}>
-                                    <Text style={styles.logo}>
-                                        My-GPS
-                                </Text>
-                                    {/* <Text style={styles.title}>Account Information</Text> */}
-                                </View>
-                                <View style={styles.infoContainer}>
-                                    <TextInput style={styles.input}
-                                        placeholder="Enter username/email"
-                                        placeholderTextColor='rgba(255,255,255,0.8)'
-                                        keyboardType='email-address'
-                                        returnKeyType='next'
-                                        autoCorrect={false}
-                                        onSubmitEditing={() => this.refs.txtPassword.focus()}
-                                    />
-                                    <TextInput style={styles.input}
-                                        placeholder="Enter password"
-                                        placeholderTextColor='rgba(255,255,255,0.8)'
-                                        returnKeyType='go'
-                                        secureTextEntry
-                                        autoCorrect={false}
-                                        ref={"txtPassword"}
-                                    />
-                                    <TouchableOpacity style={styles.buttonContainer}>
-                                        <Text style={styles.buttonText}>LOG IN</Text>
-                                    </TouchableOpacity>
+                                <Image style={{ width: deviceWidth / 2, height: deviceWidth / 2, marginBottom: 30 }} source={require('../../../assets/coev.png')}></Image>
+                                {/* <Text style={styles.title}>Account Information</Text> */}
+                            </View>
+                            <View style={styles.infoContainer}>
+                                <TextInput style={styles.input}
+                                    placeholder="Enter username/email"
+                                    placeholderTextColor='rgba(255,255,255,0.8)'
+                                    keyboardType='email-address'
+                                    returnKeyType='next'
+                                    autoCorrect={false}
+                                    onSubmitEditing={() => this.refs.txtPassword.focus()}
 
-                                </View>
+                                    onChangeText={(text) => username = text}
+                                />
+                                <TextInput style={styles.input}
+                                    placeholder="Enter password"
+                                    placeholderTextColor='rgba(255,255,255,0.8)'
+                                    returnKeyType='go'
+                                    secureTextEntry
+                                    autoCorrect={false}
+                                    ref={"txtPassword"}
+
+                                    onChangeText={(text) => password = text}
+                                />
+                                <TouchableOpacity style={styles.buttonContainer}
+                                    onPress={() => {
+                                        //console.log(username, password)
+                                        this.checkAuth(username, password)
+                                    }
+                                    }
+                                >
+                                    <Text style={styles.buttonText}>LOG IN</Text>
+                                </TouchableOpacity>
 
                             </View>
-                        </TouchableWithoutFeedback>
-                    </KeyboardAvoidingView>
-                    <View >
-                        <LoginButton
-                            style={styles.buttonFacebook}
-                            publishPermissions={["publish_actions"]}
-                            onLoginFinished={
-                                (error, result) => {
-                                    if (error) {
-                                        alert("Login failed with error: " + result.error);
-                                    } else if (result.isCancelled) {
-                                        alert("Login was cancelled");
-                                    } else {
-                                        alert("Login was successful with access token: " + result.grantedPermissions + ' ' + AccessToken.getCurrentAccessToken())                                        
-                                        this.props.navigation.navigate('MainMenu');
-                                    }
+
+                        </View>
+                    </TouchableWithoutFeedback>
+                </KeyboardAvoidingView>
+                <View >
+                    <LoginButton
+                        style={styles.buttonFacebook}
+                        publishPermissions={["publish_actions"]}
+                        onLoginFinished={
+                            (error, result) => {
+                                if (error) {
+                                    alert("Login failed with error: " + result.error);
+                                } else if (result.isCancelled) {
+                                    alert("Login was cancelled");
+                                } else {
+                                    alert("Login was successful with access token: " + result.grantedPermissions + ' ' + AccessToken.getCurrentAccessToken())
+                                    this.props.navigation.navigate('MainMenu');
                                 }
                             }
-                            onLogoutFinished={() => alert("User logged out")} />
-                    </View>
+                        }
+                        onLogoutFinished={() => alert("User logged out")} />
                 </View>
-               :<MainMenu/>
+            </View>:<MainMenu/>
+
+
         );
     }
 }
 
-export default StackNavigator({
-    Login: {
-        screen: Login,
-    },
-    MainMenu: {
-        screen: MainMenu,
-    }
-});
+
 
 
 
