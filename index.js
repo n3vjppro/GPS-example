@@ -10,7 +10,7 @@ export class Main extends Component{
     }
     render(){
         try {
-            const token = await  AsyncStorage.getItem('token');
+            const token =   AsyncStorage.getItem('token');
             if (token !== null) {
                 // We have data!!
                 this.setState({ screen: 'MainMenu' })

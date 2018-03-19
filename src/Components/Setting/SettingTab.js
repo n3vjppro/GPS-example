@@ -91,10 +91,7 @@ export class SettingTab extends Component {
                 <Button full bordered danger
                     style={{ paddingLeft: 10, marginBottom: 3, paddingRight: 3 }}
                     onPress={() => {
-                        AsyncStorage.setItem('token', null);
-                        
-                        
-                        
+                        AsyncStorage.removeItem('token');      
                     }
                     }
                 >
