@@ -39,12 +39,12 @@ export default class MyTimeLine extends Component {
         // );
     }
     getLocation(userid, latitude, longitude, LastUpdate) {
-        this.setState({visible:true})
+        this.setState({ visible: true })
         var d = new Date();
         var tzoffset = (new Date()).getTimezoneOffset() * 60000;
         var n = new Date(d - tzoffset).toISOString().slice(0, 19).replace('T', ' ');
         console.log('fetch', n)
-        fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location?id=2&&day='+n, {
+        fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location?id=2&&day=' + n, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -57,7 +57,7 @@ export default class MyTimeLine extends Component {
 
                 //console.log(responseJson)
 
-                this.setState({ markers: responseJson, visible:false })
+                this.setState({ markers: responseJson, visible: false })
                 // markers = responseJson
                 // let id = 0
                 // responseJson.forEach(element => {
@@ -83,7 +83,7 @@ export default class MyTimeLine extends Component {
             .catch((error) => {
 
                 console.log(error);
-                this.setState({visible:false})
+                this.setState({ visible: false })
             })
 
     }
@@ -103,10 +103,10 @@ export default class MyTimeLine extends Component {
     }
     async markerClick(latitude, longitude) {
 
-         let latlng = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&sensor=true&key=AIzaSyBAKmIRhHy16oixr-Suxus0p7fkZqs2e7w"
+        let latlng = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&sensor=true&key=AIzaSyBAKmIRhHy16oixr-Suxus0p7fkZqs2e7w"
         await fetch(latlng).then((response) => response.json())
             .then((responseJson) => {
-                 this.setState({ markerInfor: responseJson.results[0].formatted_address })
+                this.setState({ markerInfor: responseJson.results[0].formatted_address })
                 console.log(this.state.markerInfor)
             })
             .catch((error) => {
@@ -176,18 +176,18 @@ export default class MyTimeLine extends Component {
                                 longitude: marker.Longtitude
                             }}
                             key={marker.ID}
-                            // description={marker.description}
-                            onPress={() => {
-                                 this.markerClick(marker.Latitude, marker.Longtitude)
-                            }
-                            }
+                        // description={marker.description}
+                        // onCalloutPress={() => {
+                        //      this.markerClick(marker.Latitude, marker.Longtitude)
+                        // }
+                        //}
                         >
                             <MapView.Callout
                             //tooltip
                             >
                                 <View >
                                     <Text >{marker.LastUpdate}</Text>
-                                    <Text style={{ fontWeight: 'bold' }}>{this.state.markerInfor}</Text>
+                                    <Text style={{ fontWeight: 'bold' }}>{marker.Description}</Text>
                                 </View>
                             </MapView.Callout>
                         </MapView.Marker>
@@ -195,21 +195,34 @@ export default class MyTimeLine extends Component {
                 </MapView>
 
                 <View style={{ alignItems: 'flex-end', }}>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         style={styles.reLoadMap}
                         onPress={() => this.getLocation()}>
                         <Text>Reload</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
+                    <Button transparent bordered
+                        style={styles.reLoadMap}
+                        onPress={() => this.getLocation()}
+                    >
+                        <Text>Reload</Text>
+                    </Button>
                 </View>
                 <View style={{ alignItems: 'flex-end', }}>
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         style={styles.reLoadMap}
                         onPress={this._showDateTimePicker}>
-                        <Text>Timelineee</Text>
-                    </TouchableOpacity>
+                        <Text>Timeline</Text>
+                    </TouchableOpacity> */}
+                    <Button transparent bordered
+                        style={styles.reLoadMap}
+                        onPress={this._showDateTimePicker}
+                    >
+                        <Text>Timeline</Text>
+                    </Button>
                 </View>
                 <DateTimePicker
                     isVisible={this.state.isDateTimePickerVisible}
+                    maximumDate={Date.now()}
                     onConfirm={this._handleDatePicked}
                     onCancel={this._hideDateTimePicker}
                 />
