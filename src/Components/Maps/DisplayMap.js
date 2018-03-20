@@ -1,10 +1,23 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, PermissionsAndroid, TouchableOpacity, AsyncStorage } from 'react-native';
+import { StyleSheet,  View, PermissionsAndroid, TouchableOpacity, AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
-import { Icon } from 'native-base'
 import MapView from 'react-native-maps'
 import VirtualLocation from './VirtualLocation'
 import haversine from 'haversine';
+import {
+  Container,
+  Header,
+  Title,
+  Content,
+  Button,
+  Icon,
+  ListItem,
+  Text,
+  Left,
+  Right,
+  Body,
+  Item
+} from 'native-base';
 
 let id = 0;
 export default class DisplayMap extends Component {
@@ -154,31 +167,8 @@ export default class DisplayMap extends Component {
     return (
       <View style={{ flex: 1 }}>
 
-        <View style={{
-          //position:'absolute',
-          left: 0, bottom: 0, right: 0,
-          flexDirection: 'row',
-          flex: 1,
-          //marginBottom:50
-          backgroundColor: 'rgba(255,255,255,0.5)',
-          paddingVertical: 15,
-
-        }}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.titleText}>Distance</Text>
-            <Text style={styles.detailText}>{parseFloat(this.state.distance).toFixed(2) + ' m'}</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.titleText}>Speed</Text>
-            <Text style={styles.detailText}>{parseFloat(this.state.speed * 3.6).toFixed(2) + ' km/h'}</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.titleText}>Direct</Text>
-            <Text style={styles.detailText}>{this.state.direction}</Text>
-
-          </View>
-        </View>
-        <View style={{ flex: 6 }} >
+        
+        <View style={{ flex: 10 }} >
 
           <MapView style={styles.map}
             provider="google"
@@ -206,7 +196,30 @@ export default class DisplayMap extends Component {
             />
           </MapView>
         </View>
+        <View style={{
+          //position:'absolute',
+          left: 0, bottom: 0, right: 0,
+          flexDirection: 'row',
+          flex: 1,
+          //marginBottom:50
+          backgroundColor: 'rgba(255,255,255,0.5)',
+          paddingVertical: 5,
 
+        }}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.titleText}>Distance</Text>
+            <Text style={styles.detailText}>{this.state.distance>0? parseFloat(this.state.distance).toFixed(2):'0' + ' m'}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.titleText}>Speed</Text>
+            <Text style={styles.detailText}>{this.state.speed>0?parseFloat(this.state.speed * 3.6).toFixed(2):'0' + ' km/h'}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.titleText}>Direct</Text>
+            <Text style={styles.detailText}>{this.state.direction}</Text>
+
+          </View>
+        </View>
       </View>
     );
   }

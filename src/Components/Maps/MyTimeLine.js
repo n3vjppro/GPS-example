@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, PermissionsAndroid, TouchableOpacity, AsyncStorage } from 'react-native';
+import { StyleSheet,  View, PermissionsAndroid, TouchableOpacity, AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
-import { Icon } from 'native-base'
+import { Icon, Button,Text } from 'native-base'
 import MapView from 'react-native-maps'
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import haversine from 'haversine';
@@ -158,7 +158,7 @@ export default class MyTimeLine extends Component {
 
                 <MapView style={styles.map}
                     provider="google"
-                    showsUserLocation={true}
+                    //showsUserLocation={true}
                     showsMyLocationButton={true}
                     showsCompass={true}
                     followsUserLocation={true}
@@ -200,7 +200,7 @@ export default class MyTimeLine extends Component {
                         onPress={() => this.getLocation()}>
                         <Text>Reload</Text>
                     </TouchableOpacity> */}
-                    <Button transparent bordered
+                    <Button rounded  danger
                         style={styles.reLoadMap}
                         onPress={() => this.getLocation()}
                     >
@@ -213,11 +213,11 @@ export default class MyTimeLine extends Component {
                         onPress={this._showDateTimePicker}>
                         <Text>Timeline</Text>
                     </TouchableOpacity> */}
-                    <Button transparent bordered
+                    <Button rounded danger
                         style={styles.reLoadMap}
                         onPress={this._showDateTimePicker}
                     >
-                        <Text>Timeline</Text>
+                        <Text >Timeline</Text>
                     </Button>
                 </View>
                 <DateTimePicker
@@ -233,15 +233,15 @@ export default class MyTimeLine extends Component {
 }
 const styles = StyleSheet.create({
     map: {
-        ...StyleSheet.absoluteFillObject, padding: 1, margin: 1
+        ...StyleSheet.absoluteFillObject, padding: 1, marginLeft:1
         //marginTop:50,
     },
     reLoadMap: {
-        borderRadius: 4,
-        backgroundColor: '#f4511e',
+        justifyContent:'center',
+        alignItems:'center',
         padding: 20,
         bottom: 0,
         margin: 5,
-        width: 100
+        width: 140
     }
 })

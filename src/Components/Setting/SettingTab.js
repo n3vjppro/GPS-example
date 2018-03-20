@@ -19,6 +19,7 @@ import FBSDK, { LoginManager } from 'react-native-fbsdk';
 import { FBLogin, FBLoginManager } from 'react-native-facebook-login';
 import IndexManage from '../ManagePeople/IndexManage'
 import Main from "../../../index";
+import MainNavigator from '../../MainMenu'
 
 //var { FBLogin, FBLoginManager } = require('react-native-facebook-login');
 const {
@@ -29,16 +30,16 @@ const {
 const drawerCover = require("../../../assets/drawer-cover.jpg");
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
-export class SettingTab extends Component {
+export default class SettingTab extends Component {
     constructor(props) {
         super(props)
     }
-    static navigationOptions = {
-        tabBarIcon: ({ tintColor }) => {
-            return <Icon name="settings" style={{ color: tintColor }} />
-        },
-        header: null
-    }
+    // static navigationOptions = {
+    //     tabBarIcon: ({ tintColor }) => {
+    //         return <Icon name="settings" style={{ color: tintColor }} />
+    //     },
+    //     header: null
+    // }
     //ios-home-outline, ios-planet-outline, , ios-cart-outline
     render() {
         
@@ -48,7 +49,7 @@ export class SettingTab extends Component {
                 <Image source={drawerCover} style={styles.drawerCover} />
                 <Button full bordered info
                     style={{ paddingLeft: 10, marginBottom: 3, paddingRight: 3 }}
-                    onPress={() => alert("noti")}
+                    onPress={() => this.props.navigation.navigate('MainNavigator')}
                 >
                     <Left >
                         <Text>Tracking Location</Text>
@@ -132,11 +133,8 @@ const styles = StyleSheet.create({
     },
 })
 
-export default StackNavigator({
-    SettingTab: {
-        screen: SettingTab,
-    },
-    IndexManage: {
-        screen: IndexManage,
-    }
-});
+// export const stack= StackNavigator({       
+//     IndexManage: {
+//         screen: IndexManage,
+//     }
+// });

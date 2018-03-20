@@ -8,15 +8,15 @@ import {
 import Modal from 'react-native-modalbox'
 
 
-export default class ModalAdd extends Component {
+export default class ModalJoin extends Component {
     constructor(props) {
         super(props);
     }
     showModal = () => {
         this.refs.myModal.open();
     }
-    async createGroup(name,userid) {
-        await fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/FollowPeople/creategroup', {
+    async joinGroup(userid,passcode) {
+        await fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/FollowPeople/JoinGroup', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -25,8 +25,8 @@ export default class ModalAdd extends Component {
             },
             body: JSON.stringify({
                 UserID: userid,
-                IsParent:true,
-                Name: name
+                
+                PassCode: passcode
             }),
 
         })
@@ -36,11 +36,11 @@ export default class ModalAdd extends Component {
                 if(responseJson.success)
                 {
                 
-                alert('Done! Here is your passcode: '+responseJson.PassCode)
+                alert('Done! You are a member in group '+responseJson.Name)
                 
                 this.refs.myModal.close()
 
-                }else  alert('Something is wrong. Try again!')
+                }else  alert(responseJson.message)
             })
             .catch((error) => {
 
@@ -48,7 +48,7 @@ export default class ModalAdd extends Component {
             })
     }
     render() {
-        let name = '';
+        let PassCode = '';
         return (
             <Modal
                 ref={"myModal"}
@@ -65,22 +65,22 @@ export default class ModalAdd extends Component {
                 backdrop={true}
 
             >
-                <Text>Create your group</Text>
+                <Text>Join a group</Text>
                 <TextInput
                     style={{ width: 150, alignItems: 'center', textAlign: 'center' }}
-                    placeholder="Your group name"
+                    placeholder="Input passcode here"
                     placeholderTextColor='rgba(255,255,255,0.8)'
                     returnKeyType='go'
-                    
+                    keyboardType='numeric'
                     autoCorrect={false}
-                    onChangeText={(text) => name = text}
+                    onChangeText={(text) => PassCode = text}
                 />
                 <TouchableOpacity
                     style={{ marginBottom: 10 }}
                     onPress={
                         () => {
-                            console.log(name+' '+this.props.userId)
-                            this.createGroup(name, this.props.userId)
+                            //console.log(name+' '+this.props.userId)
+                            this.joinGroup(this.props.userId, PassCode)
                         }
                     }
                 ><Text>Submit</Text>
