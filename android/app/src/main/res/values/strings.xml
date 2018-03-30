@@ -1,5 +1,3 @@
 <resources>
-    <string name="app_name">LBA_Mobile</string>
-    <string name="facebook_app_id">365511580596755</string>
-    <string name="fb_login_protocol_scheme">fb365511580596755</string>
+    <string name="app_name">IamLost</string>
 </resources>

@@ -6,20 +6,25 @@ import {
     Content,
     Button,
     Icon,
+    List,
     ListItem,
     Text,
     Left,
     Right,
     Body,
-    Item
+    Item,
+    Card, CardItem, Thumbnail
 } from 'native-base';
 import { StyleSheet, View, PermissionsAndroid, Image, Dimensions, Platform, FlatList, TouchableOpacity } from 'react-native';
 import { TabNavigator, StackNavigator } from 'react-navigation';
 import ModalAdd from './ModalAdd'
 import ModalJoin from './ModalJoin'
-
+import ManageDetail from './ManageDetail'
 import Modal from 'react-native-modalbox'
-export default class IndexManage extends Component {
+
+const { height, width } = Dimensions.get('window');
+
+export class IndexManage extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -37,7 +42,7 @@ export default class IndexManage extends Component {
 
         this.props.navigation.setParams({
             handleModalAdd: this._addModal.bind(this),
-            handleModalJoin:this._joinModal.bind(this)
+            handleModalJoin: this._joinModal.bind(this)
 
 
         })
@@ -56,7 +61,7 @@ export default class IndexManage extends Component {
         })
             .then((response) => response.json())
             .then((responseJson) => {
-                this.setState({ groupList: [...this.state.groupList, ...responseJson.gr] })
+                this.setState({ groupList: responseJson.gr })
 
                 console.log(this.state)
             })
@@ -70,7 +75,7 @@ export default class IndexManage extends Component {
     _addModal = () => {
         this.refs.ModalAdd.showModal();
     }
-    _joinModal=()=>{
+    _joinModal = () => {
         this.refs.ModalJoin.showModal();
     }
 
@@ -84,13 +89,14 @@ export default class IndexManage extends Component {
                         </Button>
                     </Left>
                     <Body>
-                        <Text>Manage People</Text>
+                        <Text style={{ color: 'white' }}>Manage People</Text>
                     </Body>
                     <Right>
                         <Button transparent
                             onPress={() => {
-                                this.setState({groupList:[]})
-                                this.loadData(2)}}
+                                this.setState({ groupList: [] })
+                                this.loadData(2)
+                            }}
                         >
                             <Icon active name="refresh"></Icon>
                         </Button>
@@ -111,28 +117,41 @@ export default class IndexManage extends Component {
 
                 </Header>
                 <ModalAdd userId={'2'} ref={'ModalAdd'} parentList={this}></ModalAdd>
-                <ModalJoin userId={'2'}  ref={'ModalJoin'} parentList={this}></ModalJoin>
-                
+                <ModalJoin userId={'2'} ref={'ModalJoin'} parentList={this}></ModalJoin>
 
-                <FlatList
-                    data={this.state.groupList}
-                    numColumns={1}
-                    renderItem={({ item, index }) =>
-                        // <View>
-                        // <Text>{item.title}</Text>
-                        // </View>
-                        // }
+                <Content>
+                    <List
+                        dataArray={this.state.groupList}
+                        //numColumns={1}
+                        button={true}
+                        renderRow={(item) =>
 
-                        //console.log(`item = ${JSON.stringify(item)}, index = ${index}`);
-                        <FlatListItem item={item} index={index} />
+                            <ListItem avatar
+                                button={true}
+                                onPress={() => this.props.navigation.navigate('ManageDetail', { detail: item })}
+                            >
 
-                    }
-                    keyExtractor={(item, index) => index}
 
-                >
+                                <Left>
+                                    <Icon name='ios-people'  />
+                                </Left>
+                                <Body>
+                                    <Text style={{fontWeight:'bold', }}   >{item.Name}</Text>
+                                    <Text style={{color:'red'}} >Passcode: {item.PassCode}</Text>
+                                </Body>
+                                <Right>
+                                    {item.IsFollow ?<Text style={{color:'mediumseagreen'}}  > Manager </Text>:<Text style={{color:'lightblue'}}  > Tracked</Text>}
+                                </Right>
+                                {/* </Button> */}
+                                {/* <Text>{item.Name}</Text> */}
+                            </ListItem>
+                        }
+                    //keyExtractor={(item, index) => index}
 
-                </FlatList>
+                    >
 
+                    </List>
+                </Content>
             </Container>
         );
     }
@@ -144,41 +163,60 @@ export class FlatListItem extends Component {
         //console.log("aaaa", this.props.grid)
 
         return (
-
-
-            <View style={{
-                flex: 1,
-                flexDirection: 'column',
-                backgroundColor: this.props.index % 2 == 0 ? 'mediumseagreen' : 'tomato',
-
-            }}>
-                <TouchableOpacity
+            <ListItem avatar>
+                <Button
                     onPress={
                         () => //alert('group', this.props.item.Name)
-                            this.props.navigation.navigate('DetailMovie', { detail: this.props.item })
+                            this.props.navigation.navigate('ManageDetail', { detail: this.props.item })
 
                     }
 
                 >
-                    <View style={{
-                        flex: 1,
-                        flexDirection: 'row',
-                        justifyContent: 'space-between'
-                    }}>
+                    <Left>
+                        <Thumbnail name='md-search' />
+                    </Left>
+                    <Body>
                         <Text style={styles.flatListItemTitle}  >{this.props.item.Name}</Text>
                         <Text style={styles.flatListItemDetail}  >Passcode: {this.props.item.PassCode}</Text>
-                        <Text style={styles.flatListItemDetail}  >{this.props.item.IsFollow?"Manager":"Tracked"}</Text>
+                    </Body>
+                    <Right>
+                        <Text style={styles.flatListItemDetail}  >{this.props.item.IsFollow ? "Manager" : "Tracked"}</Text>
+                    </Right>
+                </Button>
+            </ListItem>
+            // <View style={{
+            //     flex: 1,
+            //     flexDirection: 'column',
+            //     backgroundColor: 'mediumseagreen' ,
 
-                    </View>
+            // }}>
+            //     <TouchableOpacity
+            //         onPress={
+            //             () => //alert('group', this.props.item.Name)
+            //                 this.props.navigation.navigate('ManageDetail', { detail: this.props.item })
 
-                    <View style={{
-                        height: 1,
-                        backgroundColor: 'white'
-                    }}>
+            //         }
 
-                    </View>
-                </TouchableOpacity>
-            </View>
+            //     >
+            //         <View style={{
+            //             flex: 1,
+            //             flexDirection: 'row',
+            //             justifyContent: 'space-between'
+            //         }}>
+            //             <Text style={styles.flatListItemTitle}  >{this.props.item.Name}</Text>
+            //             <Text style={styles.flatListItemDetail}  >Passcode: {this.props.item.PassCode}</Text>
+            //             <Text style={styles.flatListItemDetail}  >{this.props.item.IsFollow ? "Manager" : "Tracked"}</Text>
+
+            //         </View>
+
+            //         <View style={{
+            //             height: 1,
+            //             backgroundColor: 'white'
+            //         }}>
+
+            //         </View>
+            //     </TouchableOpacity>
+            // </View>
 
         );
     }
@@ -186,12 +224,12 @@ export class FlatListItem extends Component {
 const styles = StyleSheet.create({
     flatListItemTitle: {
         height: 35,
-        color: 'black',
+        color: 'white',
         padding: 3,
         fontSize: 20,
         fontWeight: 'bold',
         marginLeft: 5,
-
+        width: width / 3
     },
     flatListItemSub: {
         color: 'white',
@@ -203,6 +241,15 @@ const styles = StyleSheet.create({
         color: 'white',
         padding: 3,
         fontSize: 14,
-
+        width: width / 3
     }
 });
+
+export default groupStack = StackNavigator({
+    IndexManage: {
+        screen: IndexManage
+    },
+    ManageDetail: {
+        screen: ManageDetail
+    }
+})

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet,  View, PermissionsAndroid, TouchableOpacity, AsyncStorage } from 'react-native';
+import { StyleSheet, View, PermissionsAndroid, TouchableOpacity, AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import MapView from 'react-native-maps'
 import VirtualLocation from './VirtualLocation'
@@ -25,15 +25,28 @@ export default class DisplayMap extends Component {
     tabBarIcon: ({ tintColor }) => {
       return <Icon name="map" style={{ color: tintColor }} />
     },
-    header: null
+    headerTitle: "aaa",
+    headerRight: (
+      <Button
+        onPress={() => alert('This is a button!')}
+        title="Info"
+        color="#fff"
+      />
+    ),
   };
+
+componentDidMount () {
+  this.loadToken()
+};
+
   constructor(props) {
     super(props);
+    this.loadToken();
     this.state = {
       distance: 0,
       speed: 0.00,
       direction: '',
-
+      
     }
     // setInterval(() => {
     //   this.setState({
@@ -107,7 +120,7 @@ export default class DisplayMap extends Component {
     var tzoffset = (new Date()).getTimezoneOffset() * 60000;
     var n = new Date(d - tzoffset).toISOString().slice(0, 19).replace('T', ' ');
     console.log('fetch', n)
-    var des=''
+    var des = ''
     let latlng = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&sensor=true&key=AIzaSyBAKmIRhHy16oixr-Suxus0p7fkZqs2e7w"
     await fetch(latlng).then((response) => response.json())
       .then((responseJson) => {
@@ -133,7 +146,7 @@ export default class DisplayMap extends Component {
         latitude: latitude,
         longtitude: longitude,
         LastUpdate: n,
-        Description:des
+        Description: des
       }),
 
     })
@@ -147,6 +160,19 @@ export default class DisplayMap extends Component {
         console.log(error);
       })
 
+  }
+
+  async loadToken(){
+     try {     
+      const a =  await AsyncStorage.getItem('token');
+      if (a !== null){
+        // We have data!!
+        console.log(a);
+      }else console.log('token null')
+    } catch (error) {
+      // Error retrieving data
+      console.log('Token error.')
+    }
   }
 
   // async addMarker(region) {
@@ -166,8 +192,17 @@ export default class DisplayMap extends Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
+        <Container style={{ flex: 1 }} >
+          <Header>
+            <Left>
+              <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
+                <Icon name="md-menu" />
+              </Button>
+            </Left>
+            <Body><Text style={{color:'white'}}>Follow Me</Text></Body>
+          </Header>
+        </Container>
 
-        
         <View style={{ flex: 10 }} >
 
           <MapView style={styles.map}
@@ -208,11 +243,11 @@ export default class DisplayMap extends Component {
         }}>
           <View style={{ flex: 1 }}>
             <Text style={styles.titleText}>Distance</Text>
-            <Text style={styles.detailText}>{this.state.distance>0? parseFloat(this.state.distance).toFixed(2):'0' + ' m'}</Text>
+            <Text style={styles.detailText}>{this.state.distance > 0 ? parseFloat(this.state.distance).toFixed(2) : '0' + ' m'}</Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.titleText}>Speed</Text>
-            <Text style={styles.detailText}>{this.state.speed>0?parseFloat(this.state.speed * 3.6).toFixed(2):'0' + ' km/h'}</Text>
+            <Text style={styles.detailText}>{this.state.speed > 0 ? parseFloat(this.state.speed * 3.6).toFixed(2) : '0' + ' km/h'}</Text>
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.titleText}>Direct</Text>

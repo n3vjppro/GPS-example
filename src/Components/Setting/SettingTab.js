@@ -14,18 +14,12 @@ import {
     Item
 } from 'native-base';
 import { StyleSheet, View, PermissionsAndroid, Image,AsyncStorage, TouchableOpacity, Dimensions, Platform } from 'react-native';
-import { TabNavigator, StackNavigator } from 'react-navigation';
-import FBSDK, { LoginManager } from 'react-native-fbsdk';
-import { FBLogin, FBLoginManager } from 'react-native-facebook-login';
+import { TabNavigator, StackNavigator,NavigationActions } from 'react-navigation';
+
+
 import IndexManage from '../ManagePeople/IndexManage'
 import Main from "../../../index";
 import MainNavigator from '../../MainMenu'
-
-//var { FBLogin, FBLoginManager } = require('react-native-facebook-login');
-const {
-    LoginButton,
-    AccessToken
-} = FBSDK;
 
 const drawerCover = require("../../../assets/drawer-cover.jpg");
 const deviceHeight = Dimensions.get("window").height;
@@ -92,7 +86,7 @@ export default class SettingTab extends Component {
                 <Button full bordered danger
                     style={{ paddingLeft: 10, marginBottom: 3, paddingRight: 3 }}
                     onPress={() => {
-                        AsyncStorage.removeItem('token');      
+                        AsyncStorage.removeItem('token');
                     }
                     }
                 >
@@ -133,8 +127,3 @@ const styles = StyleSheet.create({
     },
 })
 
-// export const stack= StackNavigator({       
-//     IndexManage: {
-//         screen: IndexManage,
-//     }
-// });

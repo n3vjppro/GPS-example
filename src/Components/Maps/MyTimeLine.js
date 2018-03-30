@@ -1,7 +1,20 @@
 import React, { Component } from 'react';
-import { StyleSheet,  View, PermissionsAndroid, TouchableOpacity, AsyncStorage } from 'react-native';
+import { StyleSheet, View, PermissionsAndroid, TouchableOpacity, AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
-import { Icon, Button,Text } from 'native-base'
+import {
+    Container,
+    Header,
+    Title,
+    Content,
+    Button,
+    Icon,
+    ListItem,
+    Text,
+    Left,
+    Right,
+    Body,
+    Item
+} from 'native-base';
 import MapView from 'react-native-maps'
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import haversine from 'haversine';
@@ -12,7 +25,7 @@ export default class MyTimeLine extends Component {
         tabBarIcon: ({ tintColor }) => {
             return <Icon name="ios-locate" style={{ color: tintColor }} />
         },
-        header: null
+
     };
 
     constructor(props) {
@@ -125,7 +138,7 @@ export default class MyTimeLine extends Component {
         var month = date.getMonth() + 1;
         var bd = month + "/" + date.getDate() + "/" + date.getFullYear();
         console.log(bd)
-        let dayApi = "http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location?id=2&&day=" + bd;
+        let dayApi = "http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location?id=3&&day=" + bd;
         //this.setState({ textBirthDay: bd })
         //console.log('A date has been picked: ', this.state.textBirthDay);
         this.setState({ visible: true })
@@ -155,93 +168,101 @@ export default class MyTimeLine extends Component {
     render() {
         return (
             <View style={{ flex: 1 }}>
-
-                <MapView style={styles.map}
-                    provider="google"
-                    //showsUserLocation={true}
-                    showsMyLocationButton={true}
-                    showsCompass={true}
-                    followsUserLocation={true}
-                    initialRegion={{
-                        latitude: 16.0585026,
-                        longitude: 108.2199589,
-                        latitudeDelta: 0.0922,
-                        longitudeDelta: 0.0421,
-                    }}
-                >
-                    {this.state.markers.map(marker => (
-                        <MapView.Marker
-                            coordinate={{
-                                latitude: marker.Latitude,
-                                longitude: marker.Longtitude
-                            }}
-                            key={marker.ID}
-                        // description={marker.description}
-                        // onCalloutPress={() => {
-                        //      this.markerClick(marker.Latitude, marker.Longtitude)
-                        // }
-                        //}
-                        >
-                            <MapView.Callout
-                            //tooltip
-                            >
-                                <View >
-                                    <Text >{marker.LastUpdate}</Text>
-                                    <Text style={{ fontWeight: 'bold' }}>{marker.Description}</Text>
-                                </View>
-                            </MapView.Callout>
-                        </MapView.Marker>
-                    ))}
-                </MapView>
-
-                <View style={{ alignItems: 'flex-end', }}>
-                    {/* <TouchableOpacity
-                        style={styles.reLoadMap}
-                        onPress={() => this.getLocation()}>
-                        <Text>Reload</Text>
-                    </TouchableOpacity> */}
-                    <Button rounded  danger
-                        style={styles.reLoadMap}
-                        onPress={() => this.getLocation()}
+                <Container style={{ flex: 1 }} >
+                    <Header>
+                        <Left>
+                            <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
+                                <Icon name="md-menu" />
+                            </Button>
+                        </Left>
+                        <Body><Text style={{color:'white'}}>Where did I go</Text></Body>
+                    </Header>
+                </Container>
+                
+                <View style={{flex:10}} >
+                    <MapView style={styles.map}
+                        provider="google"
+                        //showsUserLocation={true}
+                        showsMyLocationButton={true}
+                        showsCompass={true}
+                        followsUserLocation={true}
+                        initialRegion={{
+                            latitude: 16.0585026,
+                            longitude: 108.2199589,
+                            latitudeDelta: 0.0922,
+                            longitudeDelta: 0.0421,
+                        }}
                     >
-                        <Text>Reload</Text>
-                    </Button>
-                </View>
-                <View style={{ alignItems: 'flex-end', }}>
+                        {this.state.markers.map(marker => (
+                            <MapView.Marker
+                                coordinate={{
+                                    latitude: marker.Latitude,
+                                    longitude: marker.Longtitude
+                                }}
+                                key={marker.ID}
+                            // description={marker.description}
+                            // onCalloutPress={() => {
+                            //      this.markerClick(marker.Latitude, marker.Longtitude)
+                            // }
+                            //}
+                            >
+                                <MapView.Callout
+                                //tooltip
+                                >
+                                    <View >
+                                        <Text >{marker.LastUpdate}</Text>
+                                        <Text style={{ fontWeight: 'bold' }}>{marker.Description}</Text>
+                                    </View>
+                                </MapView.Callout>
+                            </MapView.Marker>
+                        ))}
+                    </MapView>
+                    <View style={{flex:1  }}>
                     {/* <TouchableOpacity
                         style={styles.reLoadMap}
                         onPress={this._showDateTimePicker}>
                         <Text>Timeline</Text>
                     </TouchableOpacity> */}
-                    <Button rounded danger
+                    <Button
+                        bordered dark
+                        style={styles.reLoadMap}
+                        onPress={() => this.getLocation()}
+                    >
+                        <Icon name="md-refresh" />
+                        {/* <Text>Reload</Text> */}
+                    </Button>
+                    <Button
+                        bordered dark
                         style={styles.reLoadMap}
                         onPress={this._showDateTimePicker}
                     >
-                        <Text >Timeline</Text>
+                        <Icon name="ios-calendar" />
+                        {/* <Text >Timeline</Text> */}
                     </Button>
                 </View>
                 <DateTimePicker
                     isVisible={this.state.isDateTimePickerVisible}
-                    maximumDate={Date.now()}
+                    maximumDate={new Date()}
                     onConfirm={this._handleDatePicked}
                     onCancel={this._hideDateTimePicker}
                 />
                 <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: '#FFF' }} />
+                </View>
             </View >
         );
     }
 }
 const styles = StyleSheet.create({
     map: {
-        ...StyleSheet.absoluteFillObject, padding: 1, marginLeft:1
+        ...StyleSheet.absoluteFillObject, padding: 1, marginLeft: 1, top: 0, left: 0, right: 0, bottom: -25, flex:1
         //marginTop:50,
     },
     reLoadMap: {
-        justifyContent:'center',
-        alignItems:'center',
-        padding: 20,
-        bottom: 0,
+        
+        top: 0,
+        left: 0,
         margin: 5,
-        width: 140
+        width: 50,
+
     }
 })

@@ -37,7 +37,7 @@ export default class ModalAdd extends Component {
                 {
                 
                 alert('Done! Here is your passcode: '+responseJson.PassCode)
-                
+                this.props.parentList.loadData(userid)
                 this.refs.myModal.close()
 
                 }else  alert('Something is wrong. Try again!')

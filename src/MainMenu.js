@@ -69,8 +69,4 @@ export const stack = StackNavigator({
         screen: drawer
     },
     
-},stackNavigatorConfig = {
-    //initialRouteName: MoviesComponent,
-
-   // headerMode:'none'
 });

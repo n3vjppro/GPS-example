@@ -5,51 +5,36 @@ import {
     TextInput, SafeAreaView, Keyboard, TouchableOpacity,
     KeyboardAvoidingView, Image, Dimensions, AsyncStorage
 } from 'react-native';
-import { StackNavigator } from 'react-navigation';
-import FBSDK, { LoginManager } from 'react-native-fbsdk'
+import { StackNavigator,NavigationActions  } from 'react-navigation';
 import MainMenu from '../../MainMenu'
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
-const {
-    LoginButton,
-    AccessToken
-} = FBSDK;
-
-export default class Login extends Component {
+import SettingTab from '../Setting/SettingTab'
+export default  class Login extends Component {
     constructor(props) {
         super(props);
+        this.state={screen:'Login'}
         
-        
+    }
+
+    async checkToken(){   
         try {
-            const token =  AsyncStorage.getItem('token');
+            const token = await  AsyncStorage.getItem('token');
+            console.log('Login Token: ', token)
             if (token !== null) {
                 // We have data!!
-                this.state = { screen: 'MainMenu' }
-            }else this.state = { screen: 'Login' }
+                this.setState = { screen: 'MainMenu' }
+            }else this.setState = { screen: 'Login' }
         } catch (error) {
             // Error retrieving data
+            console.log(error)
         }
     }
     static navigationOptions = {
 
         header: null
     };
-    // fbAuth() {
-    //     LoginManager.logInWithReadPermissions(['public_profile']).then(
-    //         function (result) {
-    //             if (result.isCancelled) {
-    //                 alert('Login was cancelled');
-    //             } else {
-    //                 this.props.navigation.navigate('Map')
-    //                 // alert('Login was successful with permissions: '
-    //                 //     + result.grantedPermissions.toString());
-    //             }
-    //         },
-    //         function (error) {
-    //             alert('Login failed with error: ' + error);
-    //         }
-    //     );
-    // }
+    
 
 
     async checkAuth(email, password) {
@@ -70,10 +55,10 @@ export default class Login extends Component {
                 if (responseJson.success)
                     try {
                         AsyncStorage.setItem('token', responseJson.token);
-                        console.log('success')
-                        this.setState({ screen: 'MainMenu' })
-                        // return <MainMenu />
-                    } catch (error) {
+                        console.log('success');
+                        //this.setState({ screen: 'MainMenu' })
+                        // return <MainMenu />                        
+                    }catch (error) {
                         // Error saving data
                     }
                 else alert('Email or Password invalid')
@@ -86,13 +71,16 @@ export default class Login extends Component {
             })
     }
 
-     
+     componentDidMount() {
+       // this.checkToken()
+     }
     render() {
         let username = ''
         let password = ''
+        this.checkToken();
         return (
             //  AccessToken.getCurrentAccessToken() === null ?
-            this.state.screen==='Login'?
+         this.state.screen==='Login'?
             <View style={styles.container}>
                 <StatusBar barStyle="light-content" />
                 <KeyboardAvoidingView behavior='padding' style={styles.container}>
@@ -139,37 +127,14 @@ export default class Login extends Component {
                         </View>
                     </TouchableWithoutFeedback>
                 </KeyboardAvoidingView>
-                <View >
-                    <LoginButton
-                        style={styles.buttonFacebook}
-                        publishPermissions={["publish_actions"]}
-                        onLoginFinished={
-                            (error, result) => {
-                                if (error) {
-                                    alert("Login failed with error: " + result.error);
-                                } else if (result.isCancelled) {
-                                    alert("Login was cancelled");
-                                } else {
-                                    alert("Login was successful with access token: " + result.grantedPermissions + ' ' + AccessToken.getCurrentAccessToken())
-                                    this.props.navigation.navigate('MainMenu');
-                                }
-                            }
-                        }
-                        onLogoutFinished={() => alert("User logged out")} />
-                </View>
-            </View>:<MainMenu/>
+                
+            </View>
+             :<MainMenu/>
 
 
         );
     }
 }
-
-
-
-
-
-
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
