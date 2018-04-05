@@ -17,14 +17,14 @@ import {
 } from 'native-base';
 import { StyleSheet, View, PermissionsAndroid, Image, Dimensions, Platform, FlatList, TouchableOpacity } from 'react-native';
 import { TabNavigator, StackNavigator } from 'react-navigation';
+import ShareDetail from './ShareDetail'
+import Modal from 'react-native-modalbox'
 import ModalAdd from './ModalAdd'
 import ModalJoin from './ModalJoin'
-import ManageDetail from './ManageDetail'
-import Modal from 'react-native-modalbox'
-
+import MultiChoice from './MultiChoice'
 const { height, width } = Dimensions.get('window');
 
-export class IndexManage extends Component {
+export class IndexShare extends Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -89,7 +89,7 @@ export class IndexManage extends Component {
                         </Button>
                     </Left>
                     <Body>
-                        <Text style={{ color: 'white' }}>Manage People</Text>
+                        <Text style={{ color: 'white' }}>Location Sharing</Text>
                     </Body>
                     <Right>
                         <Button transparent
@@ -110,7 +110,7 @@ export class IndexManage extends Component {
                         <Button transparent
                             onPress={() => this.props.navigation.state.params.handleModalJoin()}
                         >
-                            <Image style={{width:20, height:20}} tintColor='white' source={require('../../../assets/add_group-512.png')} />
+                            <Image style={{ width: 20, height: 20 }} tintColor='white' source={require('../../../assets/add_group-512.png')} />
                         </Button>
 
                     </Right>
@@ -128,20 +128,18 @@ export class IndexManage extends Component {
 
                             <ListItem avatar
                                 button={true}
-                                onPress={() => this.props.navigation.navigate('ManageDetail', { detail: item })}
+                                onPress={() => this.props.navigation.navigate('ShareDetail', { detail: item })}
                             >
 
 
                                 <Left>
-                                    <Icon name='ios-people'  />
+                                    <Icon name='ios-people' />
                                 </Left>
                                 <Body>
-                                    <Text style={{fontWeight:'bold', }}   >{item.Name}</Text>
-                                    <Text style={{color:'purple'}} >Passcode: {item.PassCode}</Text>
+                                    <Text style={{ fontWeight: 'bold', }}   >{item.Name}</Text>
+                                    <Text style={{ color: 'purple' }} >Passcode: {item.PassCode}</Text>
                                 </Body>
-                                <Right>
-                                    {item.IsFollow ?<Text style={{color:'mediumseagreen'}}  > Manager </Text>:<Text style={{color:'violet'}}  > Tracked</Text>}
-                                </Right>
+                              
                                 {/* </Button> */}
                                 {/* <Text>{item.Name}</Text> */}
                             </ListItem>
@@ -167,7 +165,7 @@ export class FlatListItem extends Component {
                 <Button
                     onPress={
                         () => //alert('group', this.props.item.Name)
-                            this.props.navigation.navigate('ManageDetail', { detail: this.props.item })
+                            this.props.navigation.navigate('ShareDetail', { detail: this.props.item })
 
                     }
 
@@ -245,11 +243,14 @@ const styles = StyleSheet.create({
     }
 });
 
-export default groupStack = StackNavigator({
-    IndexManage: {
-        screen: IndexManage
+export default shareStack = StackNavigator({
+    IndexShare: {
+        screen: IndexShare
     },
-    ManageDetail: {
-        screen: ManageDetail
+    ShareDetail: {
+        screen: ShareDetail
+    },
+    MultiChoice:{
+        screen: MultiChoice
     }
 })

@@ -6,7 +6,7 @@ import DisplayMap from '../src/Components/Maps/DisplayMap'
 import SettingTab from '../src/Components/Setting/SettingTab'
 import MyTimeLine from '../src/Components/Maps/MyTimeLine'
 import IndexManage from '../src/Components/ManagePeople/IndexManage'
-
+import IndexShare from '../src/Components/ShareLocation/IndexShare'
 // export  class MainMenu extends Component {
 //     static navigationOptions = {
 //         headerLeft: <Icon
@@ -41,7 +41,7 @@ export const MainNavigator = TabNavigator({
         tabBarPosition: 'bottom',
         tabBarOptions: {
             showIcon: true,
-            showLabel: false,
+            showLabel: true,
             style: {
                 backgroundColor: 'white',
             },
@@ -56,6 +56,9 @@ export default  drawer = DrawerNavigator({
     },
     IndexManage: {
         screen: IndexManage,
+    },
+    IndexShare:{
+        screen: IndexShare
     }
 
 }, drawerNavigatorConfig = {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, AppState, View, PermissionsAndroid, Dimensions, Image, TouchableWithoutFeedback, TouchableOpacity, AsyncStorage, FlatList } from 'react-native';
+import { StyleSheet, AppState, View,StatusBar, PermissionsAndroid, Dimensions, Image, TouchableWithoutFeedback, TouchableOpacity, AsyncStorage, FlatList } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import {
     Container,
@@ -37,7 +37,7 @@ import PushNotification from 'react-native-push-notification';
 
 
 
-export default class ManageDetail extends Component {
+export class ManageDetail extends Component {
     static navigationOptions = {
         tabBarIcon: ({ tintColor }) => {
             return <Icon name="ios-locate" style={{ color: tintColor }} />
@@ -80,6 +80,7 @@ export default class ManageDetail extends Component {
                 longitudeDelta
             }
         });
+       
     }
 
     getListMember(idGroup) {
@@ -107,8 +108,8 @@ export default class ManageDetail extends Component {
             })
     }
 
-    showMemberLocation(ID) {
-        fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location/GetCurrentLocation/' + ID, {
+    async showMemberLocation(ID) {
+        await fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location/GetCurrentLocation/' + ID, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -119,9 +120,10 @@ export default class ManageDetail extends Component {
             .then((response) => response.json())
             .then((responseJson) => {
                 this.setState({ memLocation: responseJson, visible: false })
-                console.log(this.state.memLocation)
+               //s console.log(this.state.memLocation)
 
                 this.addMarker(responseJson)
+                this.onRegionChange(responseJson)
             })
             .catch((error) => {
                 console.log(error);
@@ -186,7 +188,6 @@ export default class ManageDetail extends Component {
         this.getListMember(this.props.navigation.state.params.detail.ID);
         this.props.navigation.setParams({
             handleModalRadius: this._addModal.bind(this),
-            handleModalGoogle: this._googleModal.bind(this)
         })
 
         PushNotification.configure({
@@ -210,9 +211,7 @@ export default class ManageDetail extends Component {
     _addModal = () => {
         this.refs.ModalRadius.showModal();
     }
-    _googleModal = () => {
-        this.refs.ModalGoogle.showModal();
-    }
+
 
     handleNotification(radius, idUser, minute) {
         console.log(this.state.defaultLat, radius, minute)
@@ -299,20 +298,6 @@ export default class ManageDetail extends Component {
     componentWillUnmount() {
 
         AppState.addEventListener('change', this.handleAppStateChange)
-        setInterval(() => {
-            this.showMemberLocation(idUser);
-            if (geolib.isPointInCircle(
-                { latitude: this.state.memLat, longitude: this.state.memLong },
-                { latitude: this.state.defaultLat, longitude: this.state.defaultLng }, this.state.radius
-            ))
-                this.setState({ status: 'inside' })
-
-            else
-                this.setState({ status: 'Out side' })
-            console.log(this.state.status)
-        }, 20000
-        )
-        console.log('app background')
     }
     handleAppStateChange(radius, idUser, minute, appState) {
 
@@ -328,6 +313,10 @@ export default class ManageDetail extends Component {
     render() {
         return (
             <Container style={{ flex: 1 }}>
+                <StatusBar
+                    backgroundColor="white"
+                    barStyle="dark-content"
+                />
                 <Header>
                     <Left>
                         <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
@@ -335,14 +324,14 @@ export default class ManageDetail extends Component {
                         </Button>
                     </Left>
                     <Body><Text style={{ color: 'white' }}>{this.props.navigation.state.params.detail.Name}</Text></Body>
-                    {/* <Right>
+                    <Right>
                         <Button transparent
                             onPress={() => {
-                                this.props.navigation.state.params.handleModalGoogle()
+                                this.props.navigation.navigate("ModalGoogle", { addMemberMarker: this.addMemberMarker.bind(this) })
                             }}>
                             <Icon name="search" />
                         </Button>
-                    </Right> */}
+                    </Right>
                 </Header>
                 <Card style={{ flex: 2 }} >
                     <MapView style={styles.map}
@@ -351,7 +340,7 @@ export default class ManageDetail extends Component {
                         showsMyLocationButton={true}
                         showsCompass={true}
                         followsUserLocation={true}
-                        initialRegion={this.state.region}
+                        region={this.state.region}
                     //onRegionChange={this.onRegionChange}
                     >
                         {/* {this.state.markers.map(marker => (
@@ -409,7 +398,7 @@ export default class ManageDetail extends Component {
 
                         {/* <MapView.Maker onPress={() => {this.setState({selectedMarker: markerId})}} /> */}
                     </MapView>
-                    <GooglePlacesAutocomplete
+                    {/* <GooglePlacesAutocomplete
                         style={{ flex: 1, marginTop: 10 }}
                         placeholder='Input location here...'
                         minLength={2} // minimum length of text to search
@@ -479,9 +468,8 @@ export default class ManageDetail extends Component {
 
                         filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
                         debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
-                    />
+                    /> */}
                     {/* </View> */}
-                    <ModalGoogle ref={'ModalGoogle'} parentList={this}  ></ModalGoogle>
 
                     <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: '#FFF' }} />
                     <ModalRadius ref={'ModalRadius'} parentList={this}  ></ModalRadius>
@@ -499,6 +487,7 @@ export default class ManageDetail extends Component {
                                 onPress={() => {
                                     this.setState({ idMember: item.ID })
                                     this.showMemberLocation(item.ID)
+                                    
                                 }}
                             >
                                 <Left>
@@ -510,16 +499,19 @@ export default class ManageDetail extends Component {
                                 </Body>
                                 <Right>
                                     <CardItem>
-                                        <Button bordered danger
-                                            //style={{ marginRight: 10, alignItems: 'center', justifyContent: 'center' }}
-                                            onPress={() => {
-                                                this.setState({ idGroup: this.props.navigation.state.params.detail.ID })
-                                                this.props.navigation.state.params.handleModalRadius()
-                                            }
-                                            }
-                                        >
-                                            <Icon name="md-radio-button-on" />
-                                        </Button>
+                                        {this.props.navigation.state.params.detail.IsFollow ?
+                                            this.state.listMembers.IsParent ? <Text></Text> :
+                                                <Button bordered danger
+                                                    //style={{ marginRight: 10, alignItems: 'center', justifyContent: 'center' }}
+                                                    onPress={() => {
+                                                        this.setState({ idGroup: this.props.navigation.state.params.detail.ID })
+                                                        this.props.navigation.state.params.handleModalRadius()
+                                                    }
+                                                    }
+                                                >
+                                                    <Icon name="md-radio-button-on" />
+                                                </Button> : <Text></Text>}
+
 
                                         <Button bordered success
                                             style={{ marginLeft: 10 }}
@@ -650,3 +642,11 @@ const styles = StyleSheet.create({
     }
 })
 
+export default geoStack = StackNavigator({
+    ManageDetail: {
+        screen: ManageDetail
+    },
+    ModalGoogle: {
+        screen: ModalGoogle
+    }
+})

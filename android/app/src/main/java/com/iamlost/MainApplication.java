@@ -3,6 +3,9 @@ package com.iamlost;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.robinpowered.react.battery.DeviceBatteryPackage;
+import com.learnium.RNDeviceInfo.RNDeviceInfo;
+
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.pilloxa.backgroundjob.BackgroundJobPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
@@ -31,6 +34,10 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            //new FIRMessagingPackage(),
+            new DeviceBatteryPackage(),
+            new RNDeviceInfo(),
+           new BatteryStatusPackage(),
             new SplashScreenReactPackage(),
             new BackgroundJobPackage(),
             new ReactNativePushNotificationPackage(),           

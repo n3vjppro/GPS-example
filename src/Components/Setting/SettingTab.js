@@ -17,9 +17,10 @@ import { StyleSheet, View, PermissionsAndroid, Image,AsyncStorage, TouchableOpac
 import { TabNavigator, StackNavigator,NavigationActions } from 'react-navigation';
 
 
-import IndexManage from '../ManagePeople/IndexManage'
+import IndexManage from '../ManagePeople/IndexManage';
 import Main from "../../../index";
-import MainNavigator from '../../MainMenu'
+import MainNavigator from '../../MainMenu';
+import IndexShare from '../ShareLocation/IndexShare';
 
 const drawerCover = require("../../../assets/drawer-cover.jpg");
 const deviceHeight = Dimensions.get("window").height;
@@ -65,7 +66,7 @@ export default class SettingTab extends Component {
 
                 <Button full bordered success
                     style={{ paddingLeft: 10, marginBottom: 3, paddingRight: 3 }}
-                    onPress={() => alert("noti")}
+                    onPress={() => this.props.navigation.navigate('IndexShare')}
                 >
 
                     <Left><Text>Sharing Location</Text></Left>

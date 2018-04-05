@@ -76,49 +76,30 @@ export default class ModalRadius extends Component {
                     <Content>
                         <Form>
                             <Item stackedLabel>
-                                <Label>Radius</Label>
+                                <Label>Radius (meter)</Label>
                                 <Input
                                     style={{ width: 180, alignItems: 'center', textAlign: 'center',  }}
-                                    placeholder="meters"
+                                    //placeholder="meters"
                                     placeholderTextColor='rgba(111,111,111,1)'
                                     returnKeyType='go'
                                     keyboardType='numeric'
                                     autoCorrect={false}
+                                    maxLength={6}
                                     onChangeText={(text) => radiusText = text} />
                             </Item>
                             <Item stackedLabel last>
-                                <Label>Time Limit</Label>
+                                <Label>Time Limit (minute)</Label>
                                 <Input
                                     style={{ width: 180, alignItems: 'center', textAlign: 'center',  }}
-                                    placeholder="minutes"
+                                    //placeholder="minutes"
                                     placeholderTextColor='rgba(111,111,111,1)'
                                     returnKeyType='go'
                                     keyboardType='numeric'
-                                    autoCorrect={false}
+                                    autoCorrect={false}                                 
                                     onChangeText={(text) => minuteText = text} />
                             </Item>
                         </Form>
                     </Content>
-                    {/* <Text style={{ fontWeight: 'bold', color: 'white' }}>Set your zone</Text>
-                <TextInput
-                    style={{ width: 180, alignItems: 'center', textAlign: 'center', color: 'white' }}
-                    placeholder="Input radius here (meter)"
-                    placeholderTextColor='rgba(255,255,255,0.8)'
-                    returnKeyType='go'
-                    keyboardType='numeric'
-                    autoCorrect={false}
-                    onChangeText={(text) => radiusText = text}
-                />
-
-                <TextInput
-                    style={{ width: 180, alignItems: 'center', textAlign: 'center', color: 'white' }}
-                    placeholder="Input the limit time (minute)"
-                    placeholderTextColor='rgba(255,255,255,0.8)'
-                    returnKeyType='go'
-                    keyboardType='numeric'
-                    autoCorrect={false}
-                    onChangeText={(text) => minuteText = text}
-                /> */}
                     <Button full info
                         style={{width:200, borderBottomLeftRadius:15, borderBottomRightRadius:15}}
                         onPress={

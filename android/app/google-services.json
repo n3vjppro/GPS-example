@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "385488551684",
+    "firebase_url": "https://my-project-1519806733393.firebaseio.com",
+    "project_id": "my-project-1519806733393",
+    "storage_bucket": "my-project-1519806733393.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:385488551684:android:4ace8747ecd5fa1f",
+        "android_client_info": {
+          "package_name": "com.iamlost"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "385488551684-jl3adv794ug0b7u1m05a4qmen8nga01t.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "385488551684-obsncc69cbrmhfstv6f1cuelftav61t2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTanxxvHuN6XAUJSh-ehi99mlvKkPndt8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

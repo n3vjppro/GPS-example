@@ -5,11 +5,12 @@ import { StackNavigator } from 'react-navigation'
 //import App from './App'
 import MainMenu from './src/MainMenu'
 import SplashScreen from 'react-native-splash-screen'
+//import App from './src/Components/Firebase/App'
 // let screen
 export class Main extends Component {
     constructor(props) {
         super(props);
-        
+        console.disableYellowBox = true;
         // this.state = { screen: 'Login', token: null };
     }
     // async getToken() {

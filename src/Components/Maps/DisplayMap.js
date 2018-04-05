@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, PermissionsAndroid, TouchableOpacity, AsyncStorage } from 'react-native';
+import { StyleSheet, View, PermissionsAndroid, TouchableOpacity, StatusBar, NativeModules, AsyncStorage, Promise, DeviceEventEmitter } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import MapView from 'react-native-maps'
 import VirtualLocation from './VirtualLocation'
 import haversine from 'haversine';
+import DeviceBattery from 'react-native-device-battery';
+
 import {
   Container,
   Header,
@@ -25,6 +27,7 @@ export default class DisplayMap extends Component {
     tabBarIcon: ({ tintColor }) => {
       return <Icon name="map" style={{ color: tintColor }} />
     },
+    title: 'Tracking Me',
     headerTitle: "aaa",
     headerRight: (
       <Button
@@ -35,18 +38,40 @@ export default class DisplayMap extends Component {
     ),
   };
 
-componentDidMount () {
-  this.loadToken()
-};
+  componentDidMount() {
+    // await navigator.geolocation.getCurrentPosition(
+    //       (position) => {
+    //         //this.setState({latitude:position.coords.latitude, longitude:position.coords.longitude})
+    //         console.log(position);
+
+    //       },
+    //       (error) => console.log(new Date(), error),
+    //       { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
+    //     )
+
+    this.setState({
+      region: {
+        latitude: 16.0585026,
+        longitude: 108.2199589,
+        latitudeDelta: 0.09,
+        longitudeDelta: 0.09
+      }
+    })
+    DeviceBattery.getBatteryLevel().then(level => {
+      this.setState({ battery: level }) // between 0 and 1
+    }).catch(reject => console.log(reject))
+
+  };
 
   constructor(props) {
     super(props);
-    this.loadToken();
+
+    // this.getInitialState()
     this.state = {
       distance: 0,
       speed: 0.00,
       direction: '',
-      
+
     }
     // setInterval(() => {
     //   this.setState({
@@ -57,15 +82,27 @@ componentDidMount () {
     // }, 1000)
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        //this.setState({latitude:position.coords.latitude, longitude:position.coords.longitude})
+        this.setState({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        })
         console.log(position);
-        alert('lat: ' + position.coords.latitude + ' long: ' + position.coords.longitude)
+
       },
       (error) => console.log(new Date(), error),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
-    );
+    )
 
     let watchID = navigator.geolocation.watchPosition((position) => {
+      AsyncStorage.setItem('curLocation', position.coords)
+      this.setState({
+        marker1:
+          {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          }
+      })
+      if (position !== null) this.onRegionChange(position.coords)
       let distance = 0;
       if (this.state.preCoords) {
         distance = this.state.distance + haversine(this.state.preCoords, position.coords, { unit: 'meter' }),
@@ -114,13 +151,18 @@ componentDidMount () {
     );
     this.state = { markers: [], watchID }
   }
-
+  // getBatteryLevel = (callback) => {
+  //   NativeModules.BatteryStatus.getBatteryStatus(callback);
+  // }
   async postLocation(userid, latitude, longitude, LastUpdate) {
     var d = new Date();
     var tzoffset = (new Date()).getTimezoneOffset() * 60000;
     var n = new Date(d - tzoffset).toISOString().slice(0, 19).replace('T', ' ');
     console.log('fetch', n)
     var des = ''
+
+
+
     let latlng = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&sensor=true&key=AIzaSyBAKmIRhHy16oixr-Suxus0p7fkZqs2e7w"
     await fetch(latlng).then((response) => response.json())
       .then((responseJson) => {
@@ -146,6 +188,7 @@ componentDidMount () {
         latitude: latitude,
         longtitude: longitude,
         LastUpdate: n,
+        Battery: parseInt(this.state.battery * 100),
         Description: des
       }),
 
@@ -162,18 +205,22 @@ componentDidMount () {
 
   }
 
-  async loadToken(){
-     try {     
-      const a =  await AsyncStorage.getItem('token');
-      if (a !== null){
+  async loadToken() {
+    try {
+      const a = await AsyncStorage.getItem('token');
+      if (a !== null) {
         // We have data!!
         console.log(a);
-      }else console.log('token null')
+      } else console.log('token null')
     } catch (error) {
       // Error retrieving data
       console.log('Token error.')
     }
   }
+  // async componentDidMount() {
+  //   
+  //   );
+
 
   // async addMarker(region) {
   //   let now = (new Date).getTime();
@@ -188,10 +235,24 @@ componentDidMount () {
   //     ladAddedMarker: now
   //   });
   // }
+  onRegionChange(region) {
+
+    this.setState({
+      region: {
+
+        latitude: region.latitude,
+        longitude: region.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+
+      }
+    })
+  }
 
   render() {
     return (
       <View style={{ flex: 1 }}>
+
         <Container style={{ flex: 1 }} >
           <Header>
             <Left>
@@ -199,7 +260,7 @@ componentDidMount () {
                 <Icon name="md-menu" />
               </Button>
             </Left>
-            <Body><Text style={{color:'white'}}>Follow Me</Text></Body>
+            <Body><Text style={{ color: 'white' }}>Tracking Me</Text></Body>
           </Header>
         </Container>
 
@@ -215,15 +276,18 @@ componentDidMount () {
             toolbarEnabled={true}
             zoomEnabled={true}
             rotateEnabled={true}
-            initialRegion={{
-              latitude: 16.0585026,
-              longitude: 108.2199589,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
+            region={this.state.region}
           //onRegionChange={(region)=>this.addMarker(region)}
 
           >
+
+            <MapView.Marker
+              coordinate={{
+                latitude: this.state.marker1.latitude,
+                longitude: this.state.marker1.longitude
+              }}
+              key={id++}
+            />
             <MapView.Polyline
               coordinates={this.state.markers.map((marker) => (marker.coordinate))}
               strokeWidth={4}
@@ -242,11 +306,11 @@ componentDidMount () {
 
         }}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.titleText}>Distance</Text>
+            <Text style={styles.titleText}>Distance (m)</Text>
             <Text style={styles.detailText}>{this.state.distance > 0 ? parseFloat(this.state.distance).toFixed(2) : '0' + ' m'}</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.titleText}>Speed</Text>
+            <Text style={styles.titleText}>Speed (km/h)</Text>
             <Text style={styles.detailText}>{this.state.speed > 0 ? parseFloat(this.state.speed * 3.6).toFixed(2) : '0' + ' km/h'}</Text>
           </View>
           <View style={{ flex: 1 }}>

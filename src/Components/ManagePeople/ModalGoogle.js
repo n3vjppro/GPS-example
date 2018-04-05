@@ -5,40 +5,37 @@ import {
     TextInput, Keyboard, TouchableOpacity,
     KeyboardAvoidingView, Image, Dimensions, AsyncStorage, Platform
 } from 'react-native';
-import { Container, Header, Content, Form, Item, Input, Label, Button, Text } from 'native-base';
-import Modal from 'react-native-modalbox';
+import { Container, Header, Content, Form, Item, Left, Body, Icon, Input, Label, Button, Text } from 'native-base';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 export default class ModalGoogle extends Component {
+    static navigationOptions = {
+        header: null
+    };
     constructor(props) {
         super(props);
+        this.state = {
+            locationName: ''
+        }
+    }
 
-    }
-    showModal = () => {
-        this.refs.myModal.open();
-    }
 
     render() {
 
         return (
-            <Modal
-                ref={"myModal"}
-                style={{
-                    justifyContent: 'center',
-                    borderRadius: 15,
-                    shadowRadius: 10,
-                    width: 300,
-                    height: 400,
-                    alignItems: 'center',
-                    //backgroundColor: 'rgba(0, 153, 211, 0.7)'
-                }}
-                position='center'
-                backdrop={true}
+            <Container>
+                <Header>
+                    <Left>
+                        <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
+                            <Icon name="md-menu" />
+                        </Button>
+                    </Left>
+                    <Body><Text style={{ color: 'white' }}>Select your location</Text></Body>
 
-            >
+                </Header>
                 <View style={{ flex: 1 }}>
                     <GooglePlacesAutocomplete
-                        style={{flex:1, marginTop: 10 }}
+                        style={{ flex: 1, marginTop: 10 }}
                         placeholder='Input location here...'
                         minLength={2} // minimum length of text to search
                         autoFocus={false}
@@ -48,11 +45,12 @@ export default class ModalGoogle extends Component {
                         renderDescription={row => row.description} // custom description render
                         onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
 
-                            this.props.parentList.addMemberMarker(details.geometry.location)
+                            this.props.navigation.state.params.addMemberMarker(details.geometry.location)
                             //console.log(this.state.memLat)
+                            this.props.navigation.goBack();
                         }}
                         textInputProps={{
-                            onChangeText: (text) => { this.props.parentList.setState({ locationName: text }) }
+                            onChangeText: (text) => { this.setState({ locationName: text }) }
                         }}
                         getDefaultValue={() => ''}
 
@@ -108,8 +106,13 @@ export default class ModalGoogle extends Component {
                         filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
                         debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
                     />
+                    <Button full
+                    onPress={()=>this.props.navigation.goBack()}
+                    >
+                        <Text>Back</Text>
+                    </Button>
                 </View>
-            </Modal>
+            </Container>
         );
     }
 }

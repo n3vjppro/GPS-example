@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, PermissionsAndroid, TouchableOpacity, AsyncStorage } from 'react-native';
+import { StyleSheet, View, PermissionsAndroid, TouchableOpacity, Image, AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import {
     Container,
@@ -19,12 +19,13 @@ import MapView from 'react-native-maps'
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import haversine from 'haversine';
 import Spinner from 'react-native-loading-spinner-overlay';
-
+let id = 1;
 export default class MyTimeLine extends Component {
     static navigationOptions = {
         tabBarIcon: ({ tintColor }) => {
-            return <Icon name="ios-locate" style={{ color: tintColor }} />
+            return <Image source={require('../../../assets/loc-his.png')} style={{ width: 24, height: 24, tintColor: tintColor }} />
         },
+        title: 'My Timeline'
 
     };
 
@@ -38,7 +39,7 @@ export default class MyTimeLine extends Component {
             // }}]
             markers: [],
             markerInfor: '',
-            visible: true
+            visible: true,
         }
 
         // navigator.geolocation.getCurrentPosition(
@@ -71,6 +72,7 @@ export default class MyTimeLine extends Component {
                 //console.log(responseJson)
 
                 this.setState({ markers: responseJson, visible: false })
+                if (responseJson !== null) this.onRegionChange(responseJson)
                 // markers = responseJson
                 // let id = 0
                 // responseJson.forEach(element => {
@@ -87,7 +89,7 @@ export default class MyTimeLine extends Component {
                 //         //ladAddedMarker: now
                 //     });
                 // },
-                console.log(this.state.markers)
+                console.log(responseJson)
                 // );
 
 
@@ -161,13 +163,43 @@ export default class MyTimeLine extends Component {
                 this.setState({ visible: false })
             })
     };
+    onRegionChange(region) {
 
+        this.setState({
+            region: {
+
+                latitude: region[0].Latitude,
+                longitude: region[0].Longtitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+
+            }
+        })
+    }
     componentDidMount() {
         this.getLocation()
+        // this.onRegionChange()
+
+    }
+    getInitialState() {
+        return {
+            region: {
+                latitude: 37.78825,
+                longitude: -122.4324,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+            },
+        };
     }
     render() {
         return (
             <View style={{ flex: 1 }}>
+             <DateTimePicker
+                        isVisible={this.state.isDateTimePickerVisible}
+                        maximumDate={new Date()}
+                        onConfirm={this._handleDatePicked}
+                        onCancel={this._hideDateTimePicker}
+                    />
                 <Container style={{ flex: 1 }} >
                     <Header>
                         <Left>
@@ -175,23 +207,37 @@ export default class MyTimeLine extends Component {
                                 <Icon name="md-menu" />
                             </Button>
                         </Left>
-                        <Body><Text style={{color:'white'}}>Where did I go</Text></Body>
+                        <Body><Text style={{ color: 'white' }}>My Timeline</Text></Body>
+                        <Right>
+                            {/* <Button
+                                bordered dark
+                                style={styles.reLoadMap}
+                                onPress={() => this.getLocation()}
+                            >
+                                <Icon name="md-refresh" />
+                                
+                           /> */}
+                            <Button
+                                transparent
+                                style={styles.reLoadMap}
+                                onPress={this._showDateTimePicker}
+                            >
+                                <Icon name="md-calendar" />
+                                {/* <Text >Timeline</Text> */}
+                            </Button>
+                        </Right>
                     </Header>
                 </Container>
-                
-                <View style={{flex:10}} >
+
+                <View style={{ flex: 10 }} >
                     <MapView style={styles.map}
                         provider="google"
                         //showsUserLocation={true}
                         showsMyLocationButton={true}
                         showsCompass={true}
                         followsUserLocation={true}
-                        initialRegion={{
-                            latitude: 16.0585026,
-                            longitude: 108.2199589,
-                            latitudeDelta: 0.0922,
-                            longitudeDelta: 0.0421,
-                        }}
+                        region={this.state.region}
+                    // onRegionChange={this.onRegionChange}
                     >
                         {this.state.markers.map(marker => (
                             <MapView.Marker
@@ -199,7 +245,7 @@ export default class MyTimeLine extends Component {
                                     latitude: marker.Latitude,
                                     longitude: marker.Longtitude
                                 }}
-                                key={marker.ID}
+                                key={id++}
                             // description={marker.description}
                             // onCalloutPress={() => {
                             //      this.markerClick(marker.Latitude, marker.Longtitude)
@@ -217,36 +263,16 @@ export default class MyTimeLine extends Component {
                             </MapView.Marker>
                         ))}
                     </MapView>
-                    <View style={{flex:1  }}>
-                    {/* <TouchableOpacity
+                    <View style={{ flex: 1 }}>
+                        {/* <TouchableOpacity
                         style={styles.reLoadMap}
                         onPress={this._showDateTimePicker}>
                         <Text>Timeline</Text>
                     </TouchableOpacity> */}
-                    <Button
-                        bordered dark
-                        style={styles.reLoadMap}
-                        onPress={() => this.getLocation()}
-                    >
-                        <Icon name="md-refresh" />
-                        {/* <Text>Reload</Text> */}
-                    </Button>
-                    <Button
-                        bordered dark
-                        style={styles.reLoadMap}
-                        onPress={this._showDateTimePicker}
-                    >
-                        <Icon name="ios-calendar" />
-                        {/* <Text >Timeline</Text> */}
-                    </Button>
-                </View>
-                <DateTimePicker
-                    isVisible={this.state.isDateTimePickerVisible}
-                    maximumDate={new Date()}
-                    onConfirm={this._handleDatePicked}
-                    onCancel={this._hideDateTimePicker}
-                />
-                <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: '#FFF' }} />
+
+                    </View>
+                   
+                    <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: '#FFF' }} />
                 </View>
             </View >
         );
@@ -254,11 +280,11 @@ export default class MyTimeLine extends Component {
 }
 const styles = StyleSheet.create({
     map: {
-        ...StyleSheet.absoluteFillObject, padding: 1, marginLeft: 1, top: 0, left: 0, right: 0, bottom: -25, flex:1
+        ...StyleSheet.absoluteFillObject, padding: 1, marginLeft: 1, top: 0, left: 0, right: 0, bottom: -25, flex: 1
         //marginTop:50,
     },
     reLoadMap: {
-        
+
         top: 0,
         left: 0,
         margin: 5,
