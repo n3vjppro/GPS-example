@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, PermissionsAndroid, TouchableOpacity, StatusBar, NativeModules, AsyncStorage, Promise, DeviceEventEmitter } from 'react-native';
+import { Animated, StyleSheet, View, PermissionsAndroid, TouchableOpacity, StatusBar, NativeModules, AsyncStorage, Promise, Dimensions } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import MapView from 'react-native-maps'
 import VirtualLocation from './VirtualLocation'
 import haversine from 'haversine';
 import DeviceBattery from 'react-native-device-battery';
-
+import LinearGradient from 'react-native-linear-gradient'
 import {
   Container,
   Header,
@@ -21,8 +21,13 @@ import {
   Item
 } from 'native-base';
 
-let id = 0;
+const { height: screenHeight, width: screenWidth } = Dimensions.get('window')
+let id = 0; latitude = 0; longitude = 0;
+
 export default class DisplayMap extends Component {
+  scroll = new Animated.Value(0)
+  headerY = Animated.multiply(Animated.diffClamp(this.scroll, 0, 56), -1)
+
   static navigationOptions = {
     tabBarIcon: ({ tintColor }) => {
       return <Icon name="map" style={{ color: tintColor }} />
@@ -38,16 +43,38 @@ export default class DisplayMap extends Component {
     ),
   };
 
-  componentDidMount() {
-    // await navigator.geolocation.getCurrentPosition(
-    //       (position) => {
-    //         //this.setState({latitude:position.coords.latitude, longitude:position.coords.longitude})
-    //         console.log(position);
+  async componentDidMount() {
+    const nDay = new Date();
+    this.setState({ nowTime: nDay.getHours() + ":" + nDay.getMinutes() });
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        latitude= position.coords.latitude,
+        longitude= position.coords.longitude
+        this.setState({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        })
+        try {
+           AsyncStorage.setItem('latitude', this.state.latitude);
+           
+        } catch (error) {
+          // Error saving data
+        }
+        try {
+           AsyncStorage.setItem('longitude', this.state.longitude);
+           
+        } catch (error) {
+          // Error saving data
+        }
+        
 
-    //       },
-    //       (error) => console.log(new Date(), error),
-    //       { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
-    //     )
+        console.log(position);
+
+      },
+      (error) => console.log(new Date(), error),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
+    )
+
 
     this.setState({
       region: {
@@ -71,8 +98,10 @@ export default class DisplayMap extends Component {
       distance: 0,
       speed: 0.00,
       direction: '',
-
     }
+    AsyncStorage.getItem('latitude').then(latitude => latitude=latitude).catch(reject=>console.log(reject));
+    AsyncStorage.getItem('longitude').then(longitude => longitude).catch(reject=>console.log(reject));;
+     
     // setInterval(() => {
     //   this.setState({
     //     distance: Math.random() * 100,
@@ -80,18 +109,6 @@ export default class DisplayMap extends Component {
     //     direction: this.state.direction === 'N' ? 'NW' : 'N',
     //   });
     // }, 1000)
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        this.setState({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        })
-        console.log(position);
-
-      },
-      (error) => console.log(new Date(), error),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
-    )
 
     let watchID = navigator.geolocation.watchPosition((position) => {
       AsyncStorage.setItem('curLocation', position.coords)
@@ -158,7 +175,7 @@ export default class DisplayMap extends Component {
     var d = new Date();
     var tzoffset = (new Date()).getTimezoneOffset() * 60000;
     var n = new Date(d - tzoffset).toISOString().slice(0, 19).replace('T', ' ');
-    console.log('fetch', n)
+    console.log('fetch', n, latitude, longitude)
     var des = ''
 
 
@@ -168,7 +185,7 @@ export default class DisplayMap extends Component {
       .then((responseJson) => {
         // this.setState({ markerInfor: responseJson.results[0].formatted_address })
         // console.log(this.state.markerInfor)
-        des = responseJson.results[0].formatted_address
+        this.setState({ des: responseJson.results[0].formatted_address })
         console.log(des)
       })
       .catch((error) => {
@@ -189,7 +206,7 @@ export default class DisplayMap extends Component {
         longtitude: longitude,
         LastUpdate: n,
         Battery: parseInt(this.state.battery * 100),
-        Description: des
+        Description: this.state.des
       }),
 
     })
@@ -239,7 +256,6 @@ export default class DisplayMap extends Component {
 
     this.setState({
       region: {
-
         latitude: region.latitude,
         longitude: region.longitude,
         latitudeDelta: 0.01,
@@ -249,77 +265,140 @@ export default class DisplayMap extends Component {
     })
   }
 
+
   render() {
+
     return (
-      <View style={{ flex: 1 }}>
 
-        <Container style={{ flex: 1 }} >
-          <Header>
-            <Left>
-              <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
-                <Icon name="md-menu" />
-              </Button>
-            </Left>
-            <Body><Text style={{ color: 'white' }}>Tracking Me</Text></Body>
-          </Header>
-        </Container>
+      <Container style={StyleSheet.absoluteFill}>
+        <Header>
+          <Left>
+            <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
+              <Icon name="md-menu" />
+            </Button>
+          </Left>
+          <Body><Text style={{ color: 'white' }}>Tracking Me</Text></Body>
+        </Header>
+        <Animated.ScrollView scrollEventThrottle={5}
+          showsVerticalScrollIndicator={false}
+          style={{ zIndex: 0 }}
+          onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.scroll } } }], { useNativeDriver: true })}>
+          <Animated.View style={{
+            height: screenHeight * 0.8,
+            width: '100%',
+            transform: [{ translateY: Animated.multiply(this.scroll, 0.5) }]
+          }}>
 
-        <View style={{ flex: 10 }} >
+            <MapView style={[StyleSheet.absoluteFill, { paddingTop: 1 }]}
+              provider="google"
+              showsUserLocation={true}
+              showsCompass={true}
+              showsMyLocationButton={true}
+              followsUserLocation={true}
+              loadingEnabled={true}
+              toolbarEnabled={true}
+              zoomEnabled={true}
+              rotateEnabled={true}
+              region={this.state.region}
+            //onRegionChange={(region)=>this.addMarker(region)}
+            >
 
-          <MapView style={styles.map}
-            provider="google"
-            showsUserLocation={true}
-            showsMyLocationButton={true}
-            showsCompass={true}
-            followsUserLocation={true}
-            loadingEnabled={true}
-            toolbarEnabled={true}
-            zoomEnabled={true}
-            rotateEnabled={true}
-            region={this.state.region}
-          //onRegionChange={(region)=>this.addMarker(region)}
+              <MapView.Marker
+                coordinate={{
+                  latitude: latitude,
+                  longitude: longitude
+                }}  
+                key={id++}
+              />
 
-          >
+              <MapView.Polyline
+                coordinates={this.state.markers.map((marker) => (marker.coordinate))}
+                strokeWidth={4}
+                strokeColor='#428bca'
+              />
+            </MapView>
+            {/* <Button transparent dark style={{
+              alignSelf: 'flex-end',
+              position: 'absolute'
+            }}
+              onPress={() => this.setState({
+                region: {
+                  latitude: this.state.latitude,
+                  longitude: this.state.longitude,
+                  latitudeDelta: 0.09,
+                  longitudeDelta: 0.09
+                }
+              })}
+            >
+              <Icon name='md-locate' />
+            </Button> */}
+          </Animated.View>
+          <View style={{ position: 'absolute', height: screenHeight * 0.8, width: '100%' }}>
+            <LinearGradient
+              colors={['rgba(245,245,245,0.0)', 'rgba(245,245,245,0.35)', 'rgba(245,245,245,1)']}
+              locations={[0, 0.7, 1]}
+              style={StyleSheet.absoluteFill} />
+          </View>
+          <View style={{
+            transform: [{ translateY: -100 }],
+            width: screenWidth,
+            //paddingHorizontal: 30,
+            //paddingVertical: 20,
+            backgroundColor: 'transparent'
+          }}>
+            <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgb(245,245,245)' }} />
+            <View style={{
+              //position:'absolute',       
+              flexDirection: 'row',
+              //marginBottom:50
+              //backgroundColor: 'rgba(255,255,255,0.5)',
+              paddingVertical: 5,
 
-            <MapView.Marker
-              coordinate={{
-                latitude: this.state.marker1.latitude,
-                longitude: this.state.marker1.longitude
-              }}
-              key={id++}
-            />
-            <MapView.Polyline
-              coordinates={this.state.markers.map((marker) => (marker.coordinate))}
-              strokeWidth={4}
-              strokeColor='#428bca'
-            />
-          </MapView>
-        </View>
-        <View style={{
-          //position:'absolute',
-          left: 0, bottom: 0, right: 0,
-          flexDirection: 'row',
+            }}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.titleText}>Distance (m)</Text>
+                <Text style={styles.detailText}>{this.state.distance > 0 ? parseFloat(this.state.distance).toFixed(2) : '0'}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.titleText}>Speed (km/h)</Text>
+                <Text style={styles.detailText}>{this.state.speed > 0 ? parseFloat(this.state.speed * 3.6).toFixed(2) : '0'}</Text>
+              </View>
+
+
+              <View style={{ flex: 1 }}>
+                <Text style={styles.titleText}>Direct</Text>
+                <Text style={styles.detailText}>{this.state.direction === '' ? 'N/A' : this.state.direction}</Text>
+              </View>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.titleText}>Started At</Text>
+              <Text style={styles.detailText}>{this.state.nowTime}</Text>
+            </View>
+            <View>
+              <Text style={{ marginLeft: 10, marginRight: 10 }}>{this.state.des}</Text>
+            </View>
+          </View>
+        </Animated.ScrollView>
+        {/* <Animated.View style={{
+          width: "100%",
+          position: "absolute",
+          transform: [{
+            translateY: this.headerY
+          }],
           flex: 1,
-          //marginBottom:50
-          backgroundColor: 'rgba(255,255,255,0.5)',
-          paddingVertical: 5,
-
+          backgroundColor: 'transparent'
         }}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.titleText}>Distance (m)</Text>
-            <Text style={styles.detailText}>{this.state.distance > 0 ? parseFloat(this.state.distance).toFixed(2) : '0' + ' m'}</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.titleText}>Speed (km/h)</Text>
-            <Text style={styles.detailText}>{this.state.speed > 0 ? parseFloat(this.state.speed * 3.6).toFixed(2) : '0' + ' km/h'}</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.titleText}>Direct</Text>
-            <Text style={styles.detailText}>{this.state.direction}</Text>
+          <Header androidStatusBarColor={'#81c784'} style={{ backgroundColor: '#98e59b' }} backgroundColor={'#98e59b'}>
+            <Body>
+              <Title style={{ color: 'white' }}>
+                McDonalds
+    </Title>
+            </Body>
+          </Header>
+        </Animated.View> */}
+      </Container>
 
-          </View>
-        </View>
-      </View>
+
     );
   }
 }

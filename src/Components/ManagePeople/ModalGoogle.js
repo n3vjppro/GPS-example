@@ -26,8 +26,8 @@ export default class ModalGoogle extends Component {
             <Container>
                 <Header>
                     <Left>
-                        <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
-                            <Icon name="md-menu" />
+                        <Button transparent onPress={()=>this.props.navigation.goBack()}>
+                            <Icon name="arrow-back" />
                         </Button>
                     </Left>
                     <Body><Text style={{ color: 'white' }}>Select your location</Text></Body>
@@ -44,10 +44,11 @@ export default class ModalGoogle extends Component {
                         fetchDetails={true}
                         renderDescription={row => row.description} // custom description render
                         onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-
-                            this.props.navigation.state.params.addMemberMarker(details.geometry.location)
+                            this.props.navigation.state.params.addMemberMarker(details.geometry.location,details.formatted_address)
+                            
                             //console.log(this.state.memLat)
                             this.props.navigation.goBack();
+                            this.props.navigation.state.params.openModal()
                         }}
                         textInputProps={{
                             onChangeText: (text) => { this.setState({ locationName: text }) }
@@ -106,11 +107,7 @@ export default class ModalGoogle extends Component {
                         filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
                         debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
                     />
-                    <Button full
-                    onPress={()=>this.props.navigation.goBack()}
-                    >
-                        <Text>Back</Text>
-                    </Button>
+                   
                 </View>
             </Container>
         );
