@@ -29,5 +29,9 @@ public class MainActivity extends ReactActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
     }
-  
+   @Override
+    public void onNewIntent(Intent intent) {
+       super.onNewIntent(intent);
+      setIntent(intent);
+   }
 }

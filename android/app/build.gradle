@@ -2,75 +2,6 @@ apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
 
-/**
- * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
- * and bundleReleaseJsAndAssets).
- * These basically call `react-native bundle` with the correct arguments during the Android build
- * cycle. By default, bundleDebugJsAndAssets is skipped, as in debug/dev mode we prefer to load the
- * bundle directly from the development server. Below you can see all the possible configurations
- * and their defaults. If you decide to add a configuration block, make sure to add it before the
- * `apply from: "../../node_modules/react-native/react.gradle"` line.
- *
- * project.ext.react = [
- *   // the name of the generated asset file containing your JS bundle
- *   bundleAssetName: "index.android.bundle",
- *
- *   // the entry file for bundle generation
- *   entryFile: "index.android.js",
- *
- *   // whether to bundle JS and assets in debug mode
- *   bundleInDebug: false,
- *
- *   // whether to bundle JS and assets in release mode
- *   bundleInRelease: true,
- *
- *   // whether to bundle JS and assets in another build variant (if configured).
- *   // See http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Build-Variants
- *   // The configuration property can be in the following formats
- *   //         'bundleIn${productFlavor}${buildType}'
- *   //         'bundleIn${buildType}'
- *   // bundleInFreeDebug: true,
- *   // bundleInPaidRelease: true,
- *   // bundleInBeta: true,
- *
- *   // whether to disable dev mode in custom build variants (by default only disabled in release)
- *   // for example: to disable dev mode in the staging build type (if configured)
- *   devDisabledInStaging: true,
- *   // The configuration property can be in the following formats
- *   //         'devDisabledIn${productFlavor}${buildType}'
- *   //         'devDisabledIn${buildType}'
- *
- *   // the root of your project, i.e. where "package.json" lives
- *   root: "../../",
- *
- *   // where to put the JS bundle asset in debug mode
- *   jsBundleDirDebug: "$buildDir/intermediates/assets/debug",
- *
- *   // where to put the JS bundle asset in release mode
- *   jsBundleDirRelease: "$buildDir/intermediates/assets/release",
- *
- *   // where to put drawable resources / React Native assets, e.g. the ones you use via
- *   // require('./image.png')), in debug mode
- *   resourcesDirDebug: "$buildDir/intermediates/res/merged/debug",
- *
- *   // where to put drawable resources / React Native assets, e.g. the ones you use via
- *   // require('./image.png')), in release mode
- *   resourcesDirRelease: "$buildDir/intermediates/res/merged/release",
- *
- *   // by default the gradle tasks are skipped if none of the JS files or assets change; this means
- *   // that we don't look at files in android/ or ios/ to determine whether the tasks are up to
- *   // date; if you have any other folders that you want to ignore for performance reasons (gradle
- *   // indexes the entire tree), add them here. Alternatively, if you have JS files in android/
- *   // for example, you might want to remove it from here.
- *   inputExcludes: ["android/**", "ios/**"],
- *
- *   // override which node gets called and with what additional arguments
- *   nodeExecutableAndArgs: ["node"],
- *
- *   // supply additional arguments to the packager
- *   extraPackagerArgs: []
- * ]
- */
 
 project.ext.react = [
     entryFile: "index.js"
@@ -94,13 +25,14 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
 
     defaultConfig {
         applicationId "com.iamlost"
-        minSdkVersion 21
-        targetSdkVersion 26
+        multiDexEnabled true
+        minSdkVersion 16
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         ndk {
@@ -151,24 +83,26 @@ android {
 dependencies {
     compile project(':react-native-linear-gradient')
     compile project(':react-native-device-battery')
-    compile project(':react-native-device-info')
+    
     compile project(':react-native-splash-screen')
     compile project(':react-native-background-job')
     compile project(':react-native-push-notification')
-    compile project(':react-native-camera')
+    
     compile(project(':react-native-maps')){
     exclude group: 'com.google.android.gms', module: 'play-services-base'
     exclude group: 'com.google.android.gms', module: 'play-services-maps'
     }
-    compile 'com.google.android.gms:play-services-base:+'
-    compile 'com.google.android.gms:play-services-maps:+'
+    compile 'com.google.android.gms:play-services-base:15.0.0'
+    compile 'com.google.android.gms:play-services-maps:15.0.0'
     compile 'com.android.support:appcompat-v7:25.1.0'
    
     compile fileTree(dir: "libs", include: ["*.jar"])
     compile "com.android.support:appcompat-v7:25.1.0"
     compile "com.facebook.react:react-native:+"  // From node_modules
     
-    
+    compile project(':react-native-fcm')
+    compile 'com.google.firebase:firebase-core:15.0.0' //this decides your firebase SDK version
+    compile 'com.google.firebase:firebase-messaging:15.0.0'
 }
 
 // Run this once to be able to run the application with BUCK
@@ -178,12 +112,12 @@ task copyDownloadableDepsToLibs(type: Copy) {
     into 'libs'
 }
 ext {
-    googlePlayServicesVersion = "+" // default: "+"
+    //googlePlayServicesVersion = "11.8.0" // default: "+"
 
     // Other settings
-    compileSdkVersion = "26" // default: 23
-    buildToolsVersion = "26.0.2" // default: "23.0.1"
-    targetSdkVersion = "26" // default: 23
+    compileSdkVersion = "25" // default: 23
+    buildToolsVersion = "25.0.3" // default: "23.0.1"
+    targetSdkVersion = "25" // default: 23
     supportLibVersion = "23.1.1" // default: 23.1.1
 }
 configurations.all {
@@ -196,3 +130,4 @@ configurations.all {
         }
     }
 }
+apply plugin: 'com.google.gms.google-services'

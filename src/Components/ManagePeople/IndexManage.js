@@ -21,14 +21,17 @@ import ModalAdd from './ModalAdd'
 import ModalJoin from './ModalJoin'
 import ManageDetail from './ManageDetail'
 import Modal from 'react-native-modalbox'
+import { userId, mainColor } from '../Common/User'
+
 
 const { height, width } = Dimensions.get('window');
-
+let id = 0;
 export class IndexManage extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            groupList: []
+            groupList: [],
+
         }
     }
     static navigationOptions = {
@@ -39,14 +42,13 @@ export class IndexManage extends Component {
         },
     };
     componentDidMount() {
-
         this.props.navigation.setParams({
             handleModalAdd: this._addModal.bind(this),
             handleModalJoin: this._joinModal.bind(this)
 
 
         })
-        this.loadData(2)
+        this.loadData(userId)
     }
 
     async loadData(idUser) {
@@ -63,7 +65,6 @@ export class IndexManage extends Component {
             .then((responseJson) => {
                 this.setState({ groupList: responseJson.gr })
 
-                console.log(this.state)
             })
             .catch((error) => {
 
@@ -82,7 +83,7 @@ export class IndexManage extends Component {
     render() {
         return (
             <Container>
-                <Header>
+                <Header androidStatusBarColor={mainColor} style={{ backgroundColor: mainColor }}>
                     <Left>
                         <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
                             <Icon name="md-menu" />
@@ -95,7 +96,7 @@ export class IndexManage extends Component {
                         <Button transparent
                             onPress={() => {
                                 this.setState({ groupList: [] })
-                                this.loadData(2)
+                                this.loadData(userId)
                             }}
                         >
                             <Icon active name="refresh"></Icon>
@@ -110,18 +111,19 @@ export class IndexManage extends Component {
                         <Button transparent
                             onPress={() => this.props.navigation.state.params.handleModalJoin()}
                         >
-                            <Image style={{width:20, height:20}} tintColor='white' source={require('../../../assets/add_group-512.png')} />
+                            <Image style={{ width: 20, height: 20 }} tintColor='white' source={require('../../../assets/add_group-512.png')} />
                         </Button>
 
                     </Right>
 
                 </Header>
-                <ModalAdd userId={'2'} ref={'ModalAdd'} parentList={this}></ModalAdd>
-                <ModalJoin userId={'2'} ref={'ModalJoin'} parentList={this}></ModalJoin>
+                <ModalAdd userId={userId} ref={'ModalAdd'} parentList={this}></ModalAdd>
+                <ModalJoin userId={userId} ref={'ModalJoin'} parentList={this}></ModalJoin>
 
                 <Content>
                     <List
                         dataArray={this.state.groupList}
+                        key={id++}
                         //numColumns={1}
                         button={true}
                         renderRow={(item) =>
@@ -133,14 +135,14 @@ export class IndexManage extends Component {
 
 
                                 <Left>
-                                    <Icon name='ios-people'  />
+                                    <Image style={{ width: 36, height: 36 }} source={require('../../../assets/group-people.png')} />
                                 </Left>
                                 <Body>
-                                    <Text style={{fontWeight:'bold', }}   >{item.Name}</Text>
-                                    <Text style={{color:'purple'}} >Passcode: {item.PassCode}</Text>
+                                    <Text style={{ fontWeight: 'bold', }}   >{item.Name}</Text>
+                                    <Text style={{ color: 'gray', fontStyle: 'italic' }} >Passcode: {item.PassCode}</Text>
                                 </Body>
                                 <Right>
-                                    {item.IsFollow ?<Text style={{color:'mediumseagreen'}}  > Manager </Text>:<Text style={{color:'violet'}}  > Tracked</Text>}
+                                    {item.IsFollow ? <Text style={{ color: 'mediumseagreen' }}  > Manager </Text> : <Text style={{ color: '#C0392B' }}  > Tracked</Text>}
                                 </Right>
                                 {/* </Button> */}
                                 {/* <Text>{item.Name}</Text> */}
@@ -246,6 +248,7 @@ const styles = StyleSheet.create({
 });
 
 export default groupStack = StackNavigator({
+    
     IndexManage: {
         screen: IndexManage
     },

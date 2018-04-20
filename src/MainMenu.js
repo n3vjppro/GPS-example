@@ -7,25 +7,12 @@ import SettingTab from '../src/Components/Setting/SettingTab'
 import MyTimeLine from '../src/Components/Maps/MyTimeLine'
 import IndexManage from '../src/Components/ManagePeople/IndexManage'
 import IndexShare from '../src/Components/ShareLocation/IndexShare'
-// export  class MainMenu extends Component {
-//     static navigationOptions = {
-//         headerLeft: <Icon
-//             name={Platform.OS === 'ios' ? 'ios-basket' : 'md-basket'}
-//             style={{ paddingLeft: 10 }} />,
-//         title: "My GPS",
-//         headerRight: <Icon
-//             name={Platform.OS === 'ios' ?
-//                 'ios-compass' : 'md-compass'}
-//             style={{ paddingRight: 10 }} />
-//     }
-//     render() {
-//         return <MainNavigator>
-//             <Text>My main Screen</Text>
-//         </MainNavigator>;
-//     }
-
-// }
-
+import ShareDetail from '../src/Components/ShareLocation/ShareDetail'
+import index from '../index'
+import shareStack from './Components/ShareLocation/IndexShare'
+import IndexRecommend from './Components/RecommendLocation/IndexRecommend'
+import { mainColor } from './Components/Common/User'
+import SideBar from './Components/Maps/SideBar'
 export const MainNavigator = TabNavigator({
     DisplayMapTab: {
         screen: DisplayMap
@@ -45,20 +32,24 @@ export const MainNavigator = TabNavigator({
             style: {
                 backgroundColor: 'white',
             },
-            activeTintColor: 'blue',
+            activeTintColor: mainColor,
             inactiveTintColor: 'gray',
         }
     });
 
-export default  drawer = DrawerNavigator({
+export default drawer = DrawerNavigator({
     MainNavigator: {
-        screen: MainNavigator
+        screen: MainNavigator,
+    },
+    IndexShare: {
+        screen: IndexShare,
     },
     IndexManage: {
         screen: IndexManage,
     },
-    IndexShare:{
-        screen: IndexShare
+    
+    IndexRecommend: {
+        screen: IndexRecommend,
     }
 
 }, drawerNavigatorConfig = {
@@ -71,5 +62,12 @@ export const stack = StackNavigator({
     Drawer: {
         screen: drawer
     },
-    
+    IndexShare: {
+        screen: IndexShare
+    },
+    ShareDetail: {
+        screen: ShareDetail
+    }
+
 });
+

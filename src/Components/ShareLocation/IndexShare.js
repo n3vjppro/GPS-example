@@ -21,9 +21,10 @@ import ShareDetail from './ShareDetail'
 import Modal from 'react-native-modalbox'
 import ModalAdd from './ModalAdd'
 import ModalJoin from './ModalJoin'
-import MultiChoice from './MultiChoice'
+import { userId, mainColor } from '../Common/User'
+import Main from '../../../index'
 const { height, width } = Dimensions.get('window');
-
+let id = 0
 export class IndexShare extends Component {
     constructor(props) {
         super(props)
@@ -46,7 +47,7 @@ export class IndexShare extends Component {
 
 
         })
-        this.loadData(2)
+        this.loadData(userId)
     }
 
     async loadData(idUser) {
@@ -62,8 +63,6 @@ export class IndexShare extends Component {
             .then((response) => response.json())
             .then((responseJson) => {
                 this.setState({ groupList: responseJson.gr })
-
-                console.log(this.state)
             })
             .catch((error) => {
 
@@ -82,7 +81,7 @@ export class IndexShare extends Component {
     render() {
         return (
             <Container>
-                <Header>
+                <Header androidStatusBarColor={mainColor} style={{ backgroundColor: mainColor }}>
                     <Left>
                         <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
                             <Icon name="md-menu" />
@@ -95,7 +94,7 @@ export class IndexShare extends Component {
                         <Button transparent
                             onPress={() => {
                                 this.setState({ groupList: [] })
-                                this.loadData(2)
+                                this.loadData(userId)
                             }}
                         >
                             <Icon active name="refresh"></Icon>
@@ -116,14 +115,15 @@ export class IndexShare extends Component {
                     </Right>
 
                 </Header>
-                <ModalAdd userId={'2'} ref={'ModalAdd'} parentList={this}></ModalAdd>
-                <ModalJoin userId={'2'} ref={'ModalJoin'} parentList={this}></ModalJoin>
+                <ModalAdd userId={userId} ref={'ModalAdd'} parentList={this}></ModalAdd>
+                <ModalJoin userId={userId} ref={'ModalJoin'} parentList={this}></ModalJoin>
 
                 <Content>
                     <List
                         dataArray={this.state.groupList}
                         //numColumns={1}
                         button={true}
+                        key={id++}
                         renderRow={(item) =>
 
                             <ListItem avatar
@@ -133,13 +133,13 @@ export class IndexShare extends Component {
 
 
                                 <Left>
-                                    <Icon name='ios-people' />
+                                    <Image style={{ width: 36, height: 36 }} source={require('../../../assets/partnership-512.png')} />
                                 </Left>
                                 <Body>
                                     <Text style={{ fontWeight: 'bold', }}   >{item.Name}</Text>
-                                    <Text style={{ color: 'purple' }} >Passcode: {item.PassCode}</Text>
+                                    <Text style={{ color: 'gray', fontStyle: 'italic' }} >Passcode: {item.PassCode}</Text>
                                 </Body>
-                              
+
                                 {/* </Button> */}
                                 {/* <Text>{item.Name}</Text> */}
                             </ListItem>
@@ -243,14 +243,15 @@ const styles = StyleSheet.create({
     }
 });
 
+
 export default shareStack = StackNavigator({
+
     IndexShare: {
         screen: IndexShare
     },
     ShareDetail: {
         screen: ShareDetail
     },
-    MultiChoice:{
-        screen: MultiChoice
-    }
+
+
 })

@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import {
-    StyleSheet,  View, PermissionsAndroid,
+    StyleSheet, View, PermissionsAndroid,
     TouchableWithoutFeedback, StatusBar,
     TextInput, Keyboard, TouchableOpacity,
     KeyboardAvoidingView, Image, Dimensions, AsyncStorage, Platform
 } from 'react-native';
 import Modal from 'react-native-modalbox'
 import { Container, Header, Content, Form, Item, Input, Label, Button, Text } from 'native-base';
-
+import { mainColor } from '../Common/User'
 
 export default class ModalAdd extends Component {
     constructor(props) {
@@ -54,12 +54,12 @@ export default class ModalAdd extends Component {
                 ref={"myModal"}
                 style={{
                     justifyContent: 'center',
-                    borderRadius: 15 ,
+                    borderRadius: 15,
                     shadowRadius: 10,
                     width: 200,
                     height: 200,
                     alignItems: 'center',
-                   // backgroundColor: 'rgba(0, 153, 211, 0.7)'
+                    // backgroundColor: 'rgba(0, 153, 211, 0.7)'
                 }}
                 position='center'
                 backdrop={true}
@@ -90,10 +90,10 @@ export default class ModalAdd extends Component {
                 <Container>
                     <Content>
                         <Form>
-                            <Item stackedLabel style={{marginTop:40}}>
+                            <Item stackedLabel style={{ marginTop: 40 }}>
                                 <Label >Create your group</Label>
                                 <Input
-                                    style={{ width: 180,  alignItems: 'center', textAlign: 'center' }}
+                                    style={{ width: 180, alignItems: 'center', textAlign: 'center' }}
                                     placeholder=""
                                     placeholderTextColor='rgba(111,111,111,1)'
                                     returnKeyType='go'
@@ -103,8 +103,8 @@ export default class ModalAdd extends Component {
 
                         </Form>
                     </Content>
-                    <Button full info
-                        style={{ width: 200, borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }}
+                    <Button full
+                        style={{ width: 200, backgroundColor: mainColor, borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }}
                         onPress={
                             () => {
                                 console.log(name + ' ' + this.props.userId)

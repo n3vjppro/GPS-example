@@ -14,7 +14,7 @@ import {
     Left,
     Right,
     Body, Picker, Form,
-    Item, List, Card, CardItem, ActionSheet, Root
+    Item, List, Card, CardItem, ActionSheet, Root, Fab
 } from 'native-base';
 import MapView, { Marker } from 'react-native-maps'
 import DateTimePicker from 'react-native-modal-datetime-picker';
@@ -27,7 +27,7 @@ import call from 'react-native-phone-call'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import geolib from 'geolib'
 import BackgroundJob from 'react-native-background-job';
-
+import { userId, mainColor } from '../Common/User'
 var BUTTONS = ["Yes", "No"];
 var CANCEL_INDEX = 1;
 var DESTRUCTIVE_INDEX = 1;
@@ -58,10 +58,12 @@ export class ManageDetail extends Component {
             markerInfor: '',
             visible: true,
             memLocation: [],
-            markers:{
-                latitude:0,
-                longitude:0,
-                fullName:''
+            markers: {
+                latitude: 0,
+                longitude: 0,
+                fullName: '',
+                des: '',
+                LastUpdate: ''
             },
             memberMarker: [],
             region: {
@@ -71,6 +73,7 @@ export class ManageDetail extends Component {
                 longitudeDelta
             },
             radius: 0,
+            minute: 0,
             location: '',
             searchVisible: false,
             limitTime: 0,
@@ -78,7 +81,9 @@ export class ManageDetail extends Component {
             jobs: [],
             idGroup: this.props.navigation.state.params.detail.ID,
             verify: false,
-            hlButton: 'normal'
+            hlButton: 'normal',
+            activeFab: false,
+            selectedRow: -1
         }
         this.handleAppStateChange = this.handleAppStateChange.bind(this);
 
@@ -112,7 +117,6 @@ export class ManageDetail extends Component {
             .then((response) => response.json())
             .then((responseJson) => {
                 this.setState({ listMembers: responseJson.gr, visible: false })
-                //console.log(this.state.listMembers)
             })
             .catch((error) => {
                 //console.log(error);
@@ -149,6 +153,7 @@ export class ManageDetail extends Component {
 
     }
     addMemberMarker(coor, locName) {
+        console.log(coor, locName)
         this.setState({
             memberMarker: [
                 //...this.state.markers,
@@ -179,8 +184,8 @@ export class ManageDetail extends Component {
                 //     key: id++
                 // }
 
-                latitude:latlong.Latitude,
-                longitude:latlong.Longtitude,
+                latitude: latlong.Latitude,
+                longitude: latlong.Longtitude,
                 fullName
             },
             //ladAddedMarker: now
@@ -273,12 +278,13 @@ export class ManageDetail extends Component {
     }
     _addModal = () => {
         this.refs.ModalRadius.showModal();
+
     }
 
 
     handleNotification(radius, idUser, minute) {
 
-        //console.log(this.state.defaultLat, radius, minute)
+        console.log(this.state.defaultLat, radius, minute, idUser)
 
         this.setState({ radius: radius })
         //this.setState({radius:radius})
@@ -308,59 +314,6 @@ export class ManageDetail extends Component {
         alert('Your circle was set!')
 
 
-
-        // BackgroundJob.register({
-        //     jobKey: "myJob",
-        //     job: () => {
-        //         let status;
-        //         this.showMemberLocation(idUser);
-        //         if (geolib.isPointInCircle(
-        //             { latitude: this.state.memLat, longitude: this.state.memLong },
-        //             { latitude: this.state.defaultLat, longitude: this.state.defaultLng }, this.state.radius
-        //         ))
-        //         // PushNotification.localNotification({
-        //         //     id: idUser,
-        //         //     message:
-        //         //         'In side'
-        //         //     , // (required)
-        //         //     // in 60 secs, // set Date TIme,
-        //         //     autoCancel: true,
-
-        //         // });
-        //         status='in'
-
-        //         else
-        //         // PushNotification.localNotification({
-        //         //     id: idUser,
-        //         //     message:
-        //         //         'Out side'
-        //         //     , // (required)
-        //         //     // in 60 secs, // set Date TIme,
-        //         //     autoCancel: true,
-
-        //         // });
-        //         status='out'
-        //        // console.log(this.state.status)
-
-        //        PushNotification.localNotificationSchedule({
-        //             id: idUser,
-        //             message:
-        //                status
-        //             , // (required)
-        //             date: new Date(Date.now() + (minute*60000)),
-        //             // in 60 secs, // set Date TIme,
-        //             autoCancel: true,
-
-        //         });
-        //     }
-        // });
-        // BackgroundJob.schedule({
-        //     jobKey: "myJob",
-        //     period: 3000,
-        //     allowExecutionInForeground: true,
-        //     allowWhileIdle :true,
-
-        // });
     }
 
     componentWillUnmount() {
@@ -379,10 +332,25 @@ export class ManageDetail extends Component {
     handleAddCircle(ID) {
         this.setState({ idMember: ID })
         this.showMemberLocation(ID)
-        this.props.navigation.navigate("ModalGoogle", { addMemberMarker: this.addMemberMarker.bind(this), openModal: this.props.navigation.state.params.handleModalRadius.bind(this) })
+        //this.props.navigation.navigate("ModalGoogle", { addMemberMarker: this.addMemberMarker.bind(this), openModal: this.props.navigation.state.params.handleModalRadius.bind(this) })
+        this._addModal()
     }
-    showActionSheet(radius, idUser, minute) {
-        this.setState({ radius: radius })
+    async showActionSheet(radius, idUser, minute) {
+        this.setState({ radius: radius, minute: minute })
+        try {
+            await AsyncStorage.setItem('radius', radius);
+
+            // Error saving data
+        } catch (error) {
+            // Error saving data
+        }
+        try {
+
+            await AsyncStorage.setItem('minute', minute);
+        } catch (error) {
+            // Error saving data
+        }
+
         ActionSheet.show(
             {
                 options: BUTTONS,
@@ -401,7 +369,7 @@ export class ManageDetail extends Component {
         return (
             <Root>
                 <Container style={StyleSheet.absoluteFill}>
-                    <Header>
+                    <Header androidStatusBarColor={mainColor} style={{ backgroundColor: mainColor }}>
                         <Left>
                             <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
                                 <Icon name="md-menu" />
@@ -411,7 +379,10 @@ export class ManageDetail extends Component {
                     </Header>
                     <ModalRadius ref={'ModalRadius'} parentList={this}  ></ModalRadius>
 
-                    <Animated.ScrollView scrollEventThrottle={5}
+
+
+                    <Animated.ScrollView
+                        scrollEventThrottle={5}
                         showsVerticalScrollIndicator={false}
                         style={{ zIndex: 0 }}
                         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.scroll } } }], { useNativeDriver: true })}>
@@ -429,22 +400,27 @@ export class ManageDetail extends Component {
                                 region={this.state.region}
                             //onRegionChange={this.onRegionChange}
                             >
-                                
 
-                                    <Marker
-                                        coordinate={{ latitude: this.state.markers.latitude, longitude: this.state.markers.longitude }}
-                                        key={id++}
-                                        pinColor={'blue'}
-                                        //description={marker.description}
+
+                                <Marker
+                                    coordinate={{ latitude: this.state.markers.latitude, longitude: this.state.markers.longitude }}
+                                    key={id++}
+                                    pinColor={'blue'}
+                                //description={marker.description}
+                                >
+                                    {/* <MapView.Callout
+                                    //tooltip
                                     >
-                                        <Card >
-                                            <CardItem>
-                                                <Text style={{ fontWeight: 'bold' }}>{this.state.markers.fullName}</Text>
-                                            </CardItem>
+                                        
+
+                                            <View style={{ flexDirection: 'row', }}>
+                                                <Text style={{ fontWeight: 'bold', flexWrap: 'wrap' }}>{this.state.markers.des}</Text>
+                                            </View>
                                            
-                                        </Card>
-                                    </Marker>
-                                
+                                        
+                                    </MapView.Callout> */}
+                                </Marker>
+
 
                                 {this.state.memberMarker.map(marker => (
 
@@ -473,6 +449,7 @@ export class ManageDetail extends Component {
                             </MapView>
 
                         </Animated.View>
+
                         <View style={{ position: 'absolute', height: height * 0.8, width: '100%' }}>
                             <LinearGradient
                                 colors={['rgba(245,245,245,0.0)', 'rgba(245,245,245,0.35)', 'rgba(245,245,245,1)']}
@@ -490,33 +467,31 @@ export class ManageDetail extends Component {
 
                             <List
                                 dataArray={this.state.listMembers}
-
+                                selected={true}
                                 button={true}
-                                renderRow={(item) =>
+                                key={id++}
+                                renderRow={(item, index) =>
 
-                                    <ListItem
+                                    <TouchableOpacity
+                                        style={{ width: width }}
                                         onPress={() => {
-                                            this.setState({ idMember: item.ID, })
-                                            this.showMemberLocation(item.ID, item.FullName)
+                                            this.setState({ activeFab: false })
+                                            this.setState({ idMember: item.ID, selectedRow: index })
+                                            this.showMemberLocation(item.ID, item.FullName, item.LastUpdate)
 
                                         }}
                                     >
                                         <Card style={{ width: width }}>
                                             <CardItem>
                                                 <Left>
-                                                    <Icon name='ios-person' />
+                                                    <Image style={{ width: 36, height: 36 }} source={require('../../../assets/icon-user.png')} />
                                                     <Body>
-                                                        <Text style={{ fontWeight: 'bold' }} >{item.FullName}</Text>
+                                                        <Text style={[{ fontWeight: 'bold' }, this.state.selectedRow === index ? { color: 'blue' } : '']} >{item.FullName}</Text>
                                                     </Body>
                                                 </Left>
-                                            </CardItem>
-                                            <CardItem cardBody>
-                                                <Body>
-                                                    <Text style={{ fontWeight: 'normal', marginLeft: 50 }}  >Phone number: {item.PhoneNumber}</Text>
-                                                </Body>
                                                 <Right>
                                                     <Button success
-                                                        style={{ marginRight: 30 }}
+                                                        //style={{ marginRight: 30 }}
                                                         onPress={() => {
                                                             const args = {
                                                                 number: item.PhoneNumber, // String value with the number to call
@@ -530,31 +505,42 @@ export class ManageDetail extends Component {
                                                     </Button>
                                                 </Right>
                                             </CardItem>
-                                            <CardItem >
+                                            {/* <CardItem cardBody>
                                                 <Body>
-                                                    {this.props.navigation.state.params.detail.IsFollow ?
-                                                        this.state.listMembers.IsParent ? <Text> </Text> :
-                                                            <Button full bordered danger
-
-                                                                onPress={() => {
-                                                                    this.handleAddCircle(item.ID)
-                                                                }
-                                                                }
-                                                            >
-                                                                <Icon name="md-radio-button-on" />
-                                                                <Text>Set your Circle</Text>
-                                                            </Button>
-                                                        : <Text> </Text>}
+                                                    <Text style={{ fontWeight: 'normal', marginLeft: 50 }}  >Phone number: {item.PhoneNumber}</Text>
                                                 </Body>
+                                                <Right>
 
+                                                </Right>
+                                            </CardItem> */}
+                                            <CardItem >
+                                                {item.ID !== userId ?
+                                                    <Body>
+                                                        {this.props.navigation.state.params.detail.IsFollow ?
+                                                            this.state.listMembers.IsParent ? <Text> </Text> :
+                                                                <Button full bordered danger
 
-
+                                                                    onPress={() => {
+                                                                        this.setState({ activeFab: false })
+                                                                        this.handleAddCircle(item.ID)
+                                                                    }
+                                                                    }
+                                                                >
+                                                                    <Icon name="md-radio-button-on" />
+                                                                    <Text>Set your Circle</Text>
+                                                                </Button>
+                                                            : <Text> </Text>}
+                                                    </Body>
+                                                    :
+                                                    <Left>
+                                                        <Icon name='md-person' />
+                                                    </Left>}
                                             </CardItem>
                                         </Card>
 
                                         {/* </Button> */}
                                         {/* <Text>{item.Name}</Text> */}
-                                    </ListItem>
+                                    </TouchableOpacity>
 
                                 }
                             //keyExtractor={(item, index) => index}
@@ -566,24 +552,29 @@ export class ManageDetail extends Component {
                     </Animated.ScrollView>
                     <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: '#FFF' }} />
 
-                    {/* <Animated.View style={{
-                    width: "100%",
-                    position: "absolute",
-                    transform: [{
-                        translateY: this.headerY
-                    }],
-                    flex: 1,
-                    backgroundColor: 'transparent'
-                }}>
-                    <Header  style={{ backgroundColor: '#98e59b' }} backgroundColor={'#98e59b'}>
-                        <Body>
-                            <Title style={{ color: 'white' }}>
-                                Maps
-                            </Title>
-                        </Body>
-                    </Header>
-                </Animated.View> */}
                 </Container>
+                <View style={{ flex: 1, marginTop: 50 }}>
+                    <Fab
+                        active={this.state.activeFab}
+                        direction="down"
+                        containerStyle={{}}
+                        style={{ backgroundColor: '#ffbb33', }}
+                        position="topRight"
+                        onPress={() => this.setState({ activeFab: !this.state.activeFab })}>
+                        <Icon name="md-alert" />
+
+                        <Button style={{ backgroundColor: '#ff8800' }}
+                            onPress={() => alert('Are you sure that you need help?')}
+                        >
+                            <Icon name="md-hand" />
+                        </Button>
+                        <Button style={{ backgroundColor: 'red' }}
+                            onPress={() => alert('Are you sure that you are in danger?')}
+                        >
+                            <Icon name="ios-warning-outline" />
+                        </Button>
+
+                    </Fab></View>
             </Root>
         );
     }
@@ -608,7 +599,7 @@ const styles = StyleSheet.create({
         padding: 3,
         fontSize: 20,
         fontWeight: 'bold',
-        marginLeft: 5,
+        //marginLeft: 5,
         width: width / 3
     },
 

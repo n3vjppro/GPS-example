@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modalbox'
 import { Container, Header, Content, Form, Item, Input, Label, Button, Text } from 'native-base';
-
+import {mainColor} from '../Common/User'
 
 export default class ModalAdd extends Component {
     constructor(props) {
@@ -104,8 +104,8 @@ export default class ModalAdd extends Component {
 
                         </Form>
                     </Content>
-                    <Button full info
-                        style={{ width: 200, borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }}
+                    <Button full 
+                        style={{ width: 200,backgroundColor:mainColor, borderBottomLeftRadius: 15, borderBottomRightRadius: 15 }}
                         onPress={
                             () => {
                                 console.log(name + ' ' + this.props.userId)

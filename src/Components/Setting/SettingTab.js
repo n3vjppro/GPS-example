@@ -11,10 +11,11 @@ import {
     Left,
     Right,
     Body,
-    Item
+    Item,
+    Card, CardItem, Footer
 } from 'native-base';
-import { StyleSheet, View, PermissionsAndroid, Image,AsyncStorage, TouchableOpacity, Dimensions, Platform } from 'react-native';
-import { TabNavigator, StackNavigator,NavigationActions } from 'react-navigation';
+import { StyleSheet, View, PermissionsAndroid, Image, AsyncStorage, TouchableOpacity, Dimensions, Platform } from 'react-native';
+import { TabNavigator, StackNavigator, NavigationActions } from 'react-navigation';
 
 
 import IndexManage from '../ManagePeople/IndexManage';
@@ -37,69 +38,83 @@ export default class SettingTab extends Component {
     // }
     //ios-home-outline, ios-planet-outline, , ios-cart-outline
     render() {
-        
-            if(AsyncStorage.getItem('token')!==null)
-            return(
+
+
+        return (
             <Container style={styles.container}>
-                <Image source={drawerCover} style={styles.drawerCover} />
-                <Button full bordered info
-                    style={{ paddingLeft: 10, marginBottom: 3, paddingRight: 3 }}
-                    onPress={() => this.props.navigation.navigate('MainNavigator')}
-                >
-                    <Left >
-                        <Text>Tracking Location</Text>
-                    </Left>
-                    <Right><Icon active name="arrow-forward" /></Right>
+               
+                    <Image source={require('../../../assets/Location-History.jpg')} style={styles.drawerCover} />
+               
+                <Content>
+                <CardItem style={{paddingBottom:2, paddingTop:2}}>
+                    <Button full transparent iconLeft
 
-                </Button>
+                        onPress={() => this.props.navigation.navigate('MainNavigator')}
+                    >
+                        <Image source={require('../../../assets/Track-Order.png')} style={{ width: 24, height: 24 }} />
+                        <Text style={{ color: '#394041' }} >Tracking Location</Text>
+                    </Button>
+                </CardItem>
+                <CardItem style={{paddingBottom:2, paddingTop:2}}>
+                    <Button full transparent iconLeft
 
-                <Button full bordered warning
-                    style={{ paddingLeft: 10, marginBottom: 3, paddingRight: 3 }}
-                    onPress={() => this.props.navigation.navigate('IndexManage')}
-                >
+                        onPress={() => this.props.navigation.navigate('IndexManage')}
+                    >
 
-                    <Left ><Text>Manage People</Text></Left>
-                    <Right  >
-                        <Icon active name="arrow-forward" /></Right>
+                        <Image source={require('../../../assets/137-512.png')} style={{ width: 24, height: 24 }} />
+                        <Text style={{ color: '#394041' }}>Manage People</Text>
 
-                </Button>
+                    </Button>
+                </CardItem>
+                <CardItem style={{paddingBottom:2, paddingTop:2}}>
+                    <Button full transparent iconLeft
 
-                <Button full bordered success
-                    style={{ paddingLeft: 10, marginBottom: 3, paddingRight: 3 }}
-                    onPress={() => this.props.navigation.navigate('IndexShare')}
-                >
+                        onPress={() => this.props.navigation.navigate('IndexShare')}
+                    >
 
-                    <Left><Text>Sharing Location</Text></Left>
-                    <Right >
-                        <Icon active name="arrow-forward" /></Right>
-                </Button>
+                        <Image source={require('../../../assets/bubbles.png')} style={{ width: 24, height: 24 }} />
+                        <Text style={{ color: '#394041' }}>Location Sharing</Text>
 
-                <Button full bordered primary
-                    style={{ paddingLeft: 10, marginBottom: 3, paddingRight: 3 }}
-                    onPress={() => alert("noti")}
-                >
+                    </Button>
+                </CardItem>
+                <CardItem style={{paddingBottom:2, paddingTop:2}}>
+                    <Button full transparent iconLeft
 
-                    <Left><Text>Location Nearby</Text></Left>
-                    <Right >
-                        <Icon active name="arrow-forward" /></Right>
-                </Button>
+                        onPress={() =>this.props.navigation.navigate('IndexRecommend')}
+                    >
 
-                <Button full bordered danger
-                    style={{ paddingLeft: 10, marginBottom: 3, paddingRight: 3 }}
-                    onPress={() => {
-                        AsyncStorage.removeItem('token');
-                    }
-                    }
-                >
-
-                    <Left><Text>Log Out</Text></Left>
-                    <Right >
-                        <Icon active name="md-log-out" /></Right>
-                </Button>
+                        <Image source={require('../../../assets/nearby.png')} style={{ width: 24, height: 24, borderRadius: 30 }} />
+                        <Text style={{ color: '#394041' }}>Location Nearby</Text>
+                    </Button>
+                </CardItem>
+                </Content>
+                <Footer style={{backgroundColor:'white',flexDirection: 'column',alignItems:'center'}}>
+                    <Text>SENIOR PROJECT</Text>
+                    <Text>Nathan & Pedro</Text>
+                    
+                </Footer>
 
 
+
+
+
+
+
+
+                {/* // <Button full bordered danger
+                //     style={{ paddingLeft: 10, marginBottom: 3, paddingRight: 3 }}
+                //     onPress={() => {
+                //         AsyncStorage.removeItem('token');
+                //     }
+                //     }
+                // >
+
+                //     <Left><Text>Log Out</Text></Left>
+                //     <Right >
+                //         <Icon active name="md-log-out" /></Right>
+                // </Button>  */}
             </Container>);
-            else return <Main/>
+
     }
 }
 

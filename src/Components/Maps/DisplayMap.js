@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
-import { Animated, StyleSheet, View, PermissionsAndroid, TouchableOpacity, StatusBar, NativeModules, AsyncStorage, Promise, Dimensions } from 'react-native';
-import { StackNavigator } from 'react-navigation';
+import React, { Component, PureComponent } from 'react';
+import { BackHandler,Animated, StyleSheet, View, PermissionsAndroid, Image, TouchableOpacity, StatusBar, NativeModules, AsyncStorage, Promise, Dimensions, Alert } from 'react-native';
+import { StackNavigator, NavigationActions } from 'react-navigation';
 import MapView from 'react-native-maps'
 import VirtualLocation from './VirtualLocation'
 import haversine from 'haversine';
 import DeviceBattery from 'react-native-device-battery';
 import LinearGradient from 'react-native-linear-gradient'
+import { userId, mainColor } from '../Common/User'
 import {
   Container,
   Header,
@@ -18,13 +19,26 @@ import {
   Left,
   Right,
   Body,
-  Item
+  Item, Card, CardItem
 } from 'native-base';
-
+import FireBase from '../FireBase'
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window')
 let id = 0; latitude = 0; longitude = 0;
+let state = {
+  distance: 0,
+  speed: 0.00,
+  direction: '',
+  startedAt: ''
+}
+import FCM, {
+  FCMEvent,
+  RemoteNotificationResult,
+  WillPresentNotificationResult,
+  NotificationType
+} from "react-native-fcm";
 
-export default class DisplayMap extends Component {
+
+export default class DisplayMap extends PureComponent {
   scroll = new Animated.Value(0)
   headerY = Animated.multiply(Animated.diffClamp(this.scroll, 0, 56), -1)
 
@@ -44,29 +58,126 @@ export default class DisplayMap extends Component {
   };
 
   async componentDidMount() {
+
+    FCM.requestPermissions();
+
+    await FCM.getFCMToken().then(token => {
+      // alert(token);
+      //console.log("TOKEN (getFCMToken)", token);
+      //this.setState({ token: token });
+      fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/FCM', {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'token': 'vjJZjABwEjPfT9KGmxelkp3CYEgsTJjVrPnRbWRWHTe4Ddy_4O26dqIfqgbQuiO6a4ZeW4EBRsPBl__UfgzeSnSahh1'
+        },
+        body: JSON.stringify({
+          userId: userId,
+          token: token,
+
+        }),
+
+      })
+        .then((response) => response.json())
+        .then((responseJson) => {
+
+          console.log(responseJson)
+        })
+        .catch((error) => {
+
+          console.log(error);
+        })
+    });
+    FCM.subscribeToTopic('mes-annonces');
+    this.notificationListener = FCM.on(FCMEvent.Notification, async (notif) => {
+      if (notif.opened_from_tray) {
+        const resetAction = NavigationActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({
+            routeName: 'ShareDetail',
+            params: {
+              detail:
+                {
+                  ID: 11,
+                  IsFollow: true,
+                  Name: "OldFriends",
+                  PassCode: "873714",
+                }
+            },
+
+          })]
+        });
+        this.props.navigation.dispatch(resetAction);
+
+        alert('open from tray')
+      }
+      else if (notif.local_notification) {
+        // this.props.navigation.navigate('ShareDetail',
+        //   {
+        //     detail:
+        //       {
+        //         ID: 11,
+        //         IsFollow: true,
+        //         Name: "OldFriends",
+        //         PassCode: "873714",
+        //       }
+        //   })
+        const resetAction = NavigationActions.reset({
+          index: 0,
+          actions: [NavigationActions.navigate({
+            routeName: 'ShareDetail',
+            params: {
+              detail:
+                {
+                  ID: 11,
+                  IsFollow: true,
+                  Name: "OldFriends",
+                  PassCode: "873714",
+                }
+            },
+
+          })]
+        });
+        this.props.navigation.dispatch(resetAction);
+        alert('notify')
+
+      }
+      else {
+        //to do
+      }
+
+      this.showLocalNotification(notif);
+    });
+
+    FCM.on(FCMEvent.RefreshToken, token => {
+      console.log(token);
+    })
+
+
     const nDay = new Date();
     this.setState({ nowTime: nDay.getHours() + ":" + nDay.getMinutes() });
-    navigator.geolocation.getCurrentPosition(
+    await navigator.geolocation.getCurrentPosition(
       (position) => {
-        latitude= position.coords.latitude,
-        longitude= position.coords.longitude
+        latitude = position.coords.latitude,
+          longitude = position.coords.longitude
         this.setState({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         })
         try {
-           AsyncStorage.setItem('latitude', this.state.latitude);
-           
+          AsyncStorage.setItem('latitude', this.state.latitude);
+
         } catch (error) {
           // Error saving data
         }
         try {
-           AsyncStorage.setItem('longitude', this.state.longitude);
-           
+          AsyncStorage.setItem('longitude', this.state.longitude);
+
         } catch (error) {
           // Error saving data
         }
-        
+
 
         console.log(position);
 
@@ -74,41 +185,36 @@ export default class DisplayMap extends Component {
       (error) => console.log(new Date(), error),
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
     )
+    this.getCurLocation();
 
-
-    this.setState({
-      region: {
-        latitude: 16.0585026,
-        longitude: 108.2199589,
-        latitudeDelta: 0.09,
-        longitudeDelta: 0.09
-      }
-    })
     DeviceBattery.getBatteryLevel().then(level => {
       this.setState({ battery: level }) // between 0 and 1
     }).catch(reject => console.log(reject))
 
-  };
 
+  }
+  showLocalNotification(notif) {
+    FCM.presentLocalNotification({
+      title: 'My GPS',
+      body: notif.fcm.body,
+      priority: "high",
+      click_action: 's',
+      show_in_foreground: true,
+      local: true
+    });
+  }
   constructor(props) {
     super(props);
 
     // this.getInitialState()
-    this.state = {
-      distance: 0,
-      speed: 0.00,
-      direction: '',
-    }
-    AsyncStorage.getItem('latitude').then(latitude => latitude=latitude).catch(reject=>console.log(reject));
-    AsyncStorage.getItem('longitude').then(longitude => longitude).catch(reject=>console.log(reject));;
-     
-    // setInterval(() => {
-    //   this.setState({
-    //     distance: Math.random() * 100,
-    //     speed: Math.random() * 15,
-    //     direction: this.state.direction === 'N' ? 'NW' : 'N',
-    //   });
-    // }, 1000)
+    // this.state = {
+    //   distance: 0,
+    //   speed: 0.00,
+    //   direction: '',
+    // }
+    this.state = state;
+
+
 
     let watchID = navigator.geolocation.watchPosition((position) => {
       AsyncStorage.setItem('curLocation', position.coords)
@@ -143,7 +249,7 @@ export default class DisplayMap extends Component {
         this.setState({ direction: 'W' });
       else if ((x > 293 && x <= 338))
         this.setState({ direction: 'NW' });
-      this.postLocation('2', position.coords.latitude, position.coords.longitude, position.timestamp);
+      this.postLocation(userId, position.coords.latitude, position.coords.longitude, position.timestamp);
 
       this.setState({
         markers: [
@@ -167,15 +273,28 @@ export default class DisplayMap extends Component {
     },
     );
     this.state = { markers: [], watchID }
+
   }
   // getBatteryLevel = (callback) => {
   //   NativeModules.BatteryStatus.getBatteryStatus(callback);
   // }
+  async getCurLocation() {
+    await AsyncStorage.getItem('latitude').then(latitude => latitude = latitude).catch(reject => console.log(reject));
+    await AsyncStorage.getItem('longitude').then(longitude => longitude).catch(reject => console.log(reject));;
+    this.setState({
+      region: {
+        latitude,
+        longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01
+      }
+    })
+  }
   async postLocation(userid, latitude, longitude, LastUpdate) {
     var d = new Date();
     var tzoffset = (new Date()).getTimezoneOffset() * 60000;
     var n = new Date(d - tzoffset).toISOString().slice(0, 19).replace('T', ' ');
-    console.log('fetch', n, latitude, longitude)
+    // console.log('fetch', n, latitude, longitude)
     var des = ''
 
 
@@ -221,24 +340,6 @@ export default class DisplayMap extends Component {
       })
 
   }
-
-  async loadToken() {
-    try {
-      const a = await AsyncStorage.getItem('token');
-      if (a !== null) {
-        // We have data!!
-        console.log(a);
-      } else console.log('token null')
-    } catch (error) {
-      // Error retrieving data
-      console.log('Token error.')
-    }
-  }
-  // async componentDidMount() {
-  //   
-  //   );
-
-
   // async addMarker(region) {
   //   let now = (new Date).getTime();
   //   if (this.state.ladAddedMarker > now - 5000) { return; }
@@ -264,14 +365,14 @@ export default class DisplayMap extends Component {
       }
     })
   }
-
-
+  componentWillUnmount() {
+    state = this.state;
+  }
   render() {
-
+    
     return (
-
       <Container style={StyleSheet.absoluteFill}>
-        <Header>
+        <Header androidStatusBarColor={mainColor} style={{ backgroundColor: mainColor }}>
           <Left>
             <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
               <Icon name="md-menu" />
@@ -288,7 +389,6 @@ export default class DisplayMap extends Component {
             width: '100%',
             transform: [{ translateY: Animated.multiply(this.scroll, 0.5) }]
           }}>
-
             <MapView style={[StyleSheet.absoluteFill, { paddingTop: 1 }]}
               provider="google"
               showsUserLocation={true}
@@ -302,15 +402,13 @@ export default class DisplayMap extends Component {
               region={this.state.region}
             //onRegionChange={(region)=>this.addMarker(region)}
             >
-
               <MapView.Marker
                 coordinate={{
                   latitude: latitude,
                   longitude: longitude
-                }}  
+                }}
                 key={id++}
               />
-
               <MapView.Polyline
                 coordinates={this.state.markers.map((marker) => (marker.coordinate))}
                 strokeWidth={4}
@@ -344,61 +442,58 @@ export default class DisplayMap extends Component {
             width: screenWidth,
             //paddingHorizontal: 30,
             //paddingVertical: 20,
-            backgroundColor: 'transparent'
+            backgroundColor: 'transparent',
+            //height:screenHeight*0.3
           }}>
             <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgb(245,245,245)' }} />
             <View style={{
               //position:'absolute',       
-              flexDirection: 'row',
+              flexDirection: 'column',
+
               //marginBottom:50
               //backgroundColor: 'rgba(255,255,255,0.5)',
-              paddingVertical: 5,
-
+              paddingVertical: 5, marginBottom: 5
             }}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.titleText}>Distance (m)</Text>
-                <Text style={styles.detailText}>{this.state.distance > 0 ? parseFloat(this.state.distance).toFixed(2) : '0'}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.titleText}>Speed (km/h)</Text>
-                <Text style={styles.detailText}>{this.state.speed > 0 ? parseFloat(this.state.speed * 3.6).toFixed(2) : '0'}</Text>
-              </View>
-
-
-              <View style={{ flex: 1 }}>
-                <Text style={styles.titleText}>Direct</Text>
-                <Text style={styles.detailText}>{this.state.direction === '' ? 'N/A' : this.state.direction}</Text>
-              </View>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.titleText}>Started At</Text>
-              <Text style={styles.detailText}>{this.state.nowTime}</Text>
-            </View>
-            <View>
-              <Text style={{ marginLeft: 10, marginRight: 10 }}>{this.state.des}</Text>
+              <Card>
+                <CardItem>
+                  <Left>
+                    <Image source={require('../../../assets/55212.png')} style={{ width: 24, height: 24, tintColor: 'orange' }} />
+                    <Text>Distance</Text></Left>
+                  <Body>
+                    <Text >{this.state.distance > 0 ? parseFloat(this.state.distance).toFixed(2) : '0'} m</Text>
+                  </Body>
+                </CardItem>
+                <CardItem><Left>
+                  <Icon active name="ios-speedometer-outline" style={{ color: 'darkblue' }} />
+                  <Text>Speed</Text></Left>
+                  <Body>
+                    <Text >{this.state.speed > 0 ? parseFloat(this.state.speed * 3.6).toFixed(2) : '0'} km/h</Text>
+                  </Body>
+                </CardItem>
+                <CardItem>
+                  <Left>
+                    <Icon active name="ios-navigate-outline" style={{ color: 'purple' }} />
+                    <Text>Direct</Text></Left>
+                  <Body>
+                    <Text >{this.state.direction === '' ? 'N/A' : this.state.direction} </Text>
+                  </Body>
+                </CardItem>
+                <CardItem>
+                  <Left>
+                    <Icon active name="md-time" style={{ color: 'green' }} />
+                    <Text>Started At</Text></Left>
+                  <Body>
+                    <Text >{this.state.nowTime}h</Text>
+                  </Body>
+                </CardItem>
+                <CardItem>
+                  <Text >{this.state.des}</Text>
+                </CardItem>
+              </Card>
             </View>
           </View>
         </Animated.ScrollView>
-        {/* <Animated.View style={{
-          width: "100%",
-          position: "absolute",
-          transform: [{
-            translateY: this.headerY
-          }],
-          flex: 1,
-          backgroundColor: 'transparent'
-        }}>
-          <Header androidStatusBarColor={'#81c784'} style={{ backgroundColor: '#98e59b' }} backgroundColor={'#98e59b'}>
-            <Body>
-              <Title style={{ color: 'white' }}>
-                McDonalds
-    </Title>
-            </Body>
-          </Header>
-        </Animated.View> */}
       </Container>
-
-
     );
   }
 }
@@ -410,11 +505,12 @@ const styles = StyleSheet.create({
   titleText: {
     textAlign: 'center',
     fontWeight: '700',
-    color: '#666'
+    color: '#666',
+    fontSize: 18,
   },
   detailText: {
     textAlign: 'center',
     fontWeight: '200',
-    fontSize: 20,
+    color: '#666', fontSize: 18,
   }
 })

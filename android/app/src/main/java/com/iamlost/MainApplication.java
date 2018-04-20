@@ -3,10 +3,9 @@ package com.iamlost;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.evollu.react.fcm.FIRMessagingPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.robinpowered.react.battery.DeviceBatteryPackage;
-
-import com.learnium.RNDeviceInfo.RNDeviceInfo;
 
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.pilloxa.backgroundjob.BackgroundJobPackage;
@@ -17,7 +16,6 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
 
-import com.lwansbrough.RCTCamera.RCTCameraPackage;
 import com.airbnb.android.react.maps.MapsPackage;
 
 import java.util.Arrays;
@@ -36,14 +34,14 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new LinearGradientPackage(),
+            new FIRMessagingPackage(),
+            new LinearGradientPackage(),         
             new DeviceBatteryPackage(),
-            new RNDeviceInfo(),
            new BatteryStatusPackage(),
             new SplashScreenReactPackage(),
             new BackgroundJobPackage(),
             new ReactNativePushNotificationPackage(),           
-             new RCTCameraPackage(),            
+                        
               new MapsPackage()
 
       );

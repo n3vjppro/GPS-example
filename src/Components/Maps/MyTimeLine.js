@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Animated, StyleSheet, View, PermissionsAndroid, Dimensions, FlatList, TouchableOpacity, Image, AsyncStorage } from 'react-native';
+import React, { Component, PureComponent } from 'react';
+import { Animated, StyleSheet, View, PermissionsAndroid, Dimensions, DatePickerAndroid, FlatList, TouchableOpacity, Image, AsyncStorage } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import {
     Container,
@@ -15,19 +15,22 @@ import {
     Right,
     Body,
     Item,
-    Card, CardItem
+    Card, CardItem, Drawer
 } from 'native-base';
 import MapView from 'react-native-maps'
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import haversine from 'haversine';
 import Spinner from 'react-native-loading-spinner-overlay';
 import LinearGradient from 'react-native-linear-gradient'
+import { OptimizedFlatList } from 'react-native-optimized-flatlist'
+import { mainColor } from '../Common/User'
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window')
 
 let id = 1;
-export default class MyTimeLine extends Component {
-    scroll = new Animated.Value(0)
-    headerY = Animated.multiply(Animated.diffClamp(this.scroll, 0, 56), -1)
+let idList = 0;
+export default class MyTimeLine extends PureComponent {
+    // scroll = new Animated.Value(0)
+    // headerY = Animated.multiply(Animated.diffClamp(this.scroll, 0, 56), -1)
     static navigationOptions = {
         tabBarIcon: ({ tintColor }) => {
             return <Image source={require('../../../assets/loc-his.png')} style={{ width: 24, height: 24, tintColor: tintColor }} />
@@ -50,7 +53,9 @@ export default class MyTimeLine extends Component {
             memMarker: {
                 latitude: 0,
                 longitude: 0
-            }
+            },
+            selectedRow: -1,
+            curDate: new Date()
 
         }
 
@@ -109,7 +114,7 @@ export default class MyTimeLine extends Component {
             })
             .catch((error) => {
 
-                console.log(error);
+                //console.log(error);
                 this.setState({ visible: false })
             })
 
@@ -128,7 +133,7 @@ export default class MyTimeLine extends Component {
 
 
     }
-    addMemberMarker(item, id) {
+    addMemberMarker(item) {
         //console.log(lat,"asd", long)
         //let now = (new Date).getTime();
         //if (this.state.ladAddedMarker > now - 5000) { return; }
@@ -140,14 +145,13 @@ export default class MyTimeLine extends Component {
                     des: item.Description,
                     bat: item.Battery,
                     LastUpdate: item.LastUpdate,
-                    id
+                    id: item.LocationId
                 }
             ,
             //ladAddedMarker: now
         });
         this.setState({
             region: {
-
                 latitude: item.Latitude,
                 longitude: item.Longtitude,
                 latitudeDelta: 0.01,
@@ -157,53 +161,71 @@ export default class MyTimeLine extends Component {
         })
 
     }
+
     async markerClick(latitude, longitude) {
 
         let latlng = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&sensor=true&key=AIzaSyBAKmIRhHy16oixr-Suxus0p7fkZqs2e7w"
         await fetch(latlng).then((response) => response.json())
             .then((responseJson) => {
                 this.setState({ markerInfor: responseJson.results[0].formatted_address })
-                console.log(this.state.markerInfor)
+                //console.log(this.state.markerInfor)
             })
             .catch((error) => {
-                console.log(error);
+                //console.log(error);
             })
 
     }
 
     //Date time picker
-    _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+    // _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
 
-    _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
+    // _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
 
-    _handleDatePicked = (date) => {
-        this.setState({ curDate: date })
-        this.setState({ markers: [] })
-        var month = date.getMonth() + 1;
-        var bd = month + "/" + date.getDate() + "/" + date.getFullYear();
-        console.log(bd)
-        let dayApi = "http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location?id=2&&day=" + bd;
-        //this.setState({ textBirthDay: bd })
-        //console.log('A date has been picked: ', this.state.textBirthDay);
-        this.setState({ visible: true })
-        this._hideDateTimePicker();
-        fetch(dayApi, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'token': 'vjJZjABwEjPfT9KGmxelkp3CYEgsTJjVrPnRbWRWHTe4Ddy_4O26dqIfqgbQuiO6a4ZeW4EBRsPBl__UfgzeSnSahh1'
-            },
-        }).then((response) => response.json())
-            .then((responseJson) => {
-                //this.setState({ markerInfor: responseJson.results[0].formatted_address })
-                this.setState({ markers: responseJson })
-                this.setState({ visible: false })
-            })
-            .catch((error) => {
-                console.log(error);
-                this.setState({ visible: false })
-            })
+    async _handleDatePicked(date1) {
+        try {
+            const { action, year, month, day } = await DatePickerAndroid.open({
+                date: date1,
+                maxDate: new Date()
+
+            });
+            if (action === DatePickerAndroid.dateSetAction) {
+                this.setState({ visible: true })
+                var bd = (month + 1) + "/" + day + "/" + year;
+                this.setState({ curDate: new Date(year, month, day) })
+                this.setState({ markers: [] })
+                //var month = date.getMonth() + 1;
+                //month+=1;
+
+                console.log(bd)
+                let dayApi = "http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location?id=2&&day=" + bd;
+                //this.setState({ textBirthDay: bd })
+                //console.log('A date has been picked: ', this.state.textBirthDay);
+                //this.setState({ visible: true })
+                //this._hideDateTimePicker();
+                fetch(dayApi, {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        'token': 'vjJZjABwEjPfT9KGmxelkp3CYEgsTJjVrPnRbWRWHTe4Ddy_4O26dqIfqgbQuiO6a4ZeW4EBRsPBl__UfgzeSnSahh1'
+                    },
+                })
+
+                    .then((response) => response.json())
+                    .then((responseJson) => {
+                        //console.log(responseJson)
+                        //this.setState({ markerInfor: responseJson.results[0].formatted_address })
+                        this.setState({ markers: responseJson })
+                        this.setState({ visible: false })
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        this.setState({ visible: false })
+                    })
+            }
+        } catch ({ code, mess }) {
+
+        }
     };
     onRegionChange(region) {
 
@@ -242,327 +264,121 @@ export default class MyTimeLine extends Component {
         };
     }
     render() {
+        closeDrawer = () => {
+            this.drawer._root.close()
+        };
+        openDrawer = () => {
+            this.drawer._root.open()
+        };
         return (
+           
+                <View style={{ flex: 1 }}>
+                    <Header androidStatusBarColor={mainColor} style={{ backgroundColor: mainColor }}>
+                        <Left>
+                            <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
+                                <Icon name="md-menu" />
+                            </Button>
+                        </Left>
+                        <Body><Text style={{ color: 'white' }}>My Timeline</Text></Body>
+                        <Right>
+                            <Button
+                                transparent
+                                style={styles.reLoadMap}
+                                onPress={() => {
+                                    this.setState({ curDate: new Date() })
+                                    this.getLocation()
+                                }}
+                            >
+                                <Image source={require('../../../assets/today.png')} style={{ width: 20, height: 20 }} tintColor='white' />
 
-            // <Container style={StyleSheet.absoluteFill}>
-            //     <DateTimePicker
-            //         date={this.state.curDate}
-            //         isVisible={this.state.isDateTimePickerVisible}
-            //         maximumDate={new Date()}
-            //         onConfirm={this._handleDatePicked}
-            //         onCancel={this._hideDateTimePicker}
-            //     />
-            //     <Header>
-            //         <Left>
-            //             <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
-            //                 <Icon name="md-menu" />
-            //             </Button>
-            //         </Left>
-            //         <Body><Text style={{ color: 'white' }}>My Timeline</Text></Body>
-            //         <Right>
-            //             <Button
-            //                 transparent
-            //                 style={styles.reLoadMap}
-            //                 onPress={() => {
-            //                     this.setState({ curDate: new Date() })
-            //                     this.getLocation()
-            //                 }}
-            //             >
-            //                 <Image source={require('../../../assets/today.png')} style={{ width: 20, height: 20 }} tintColor='white' />
-
-            //             </Button>
-            //             <Button
-            //                 transparent
-            //                 style={styles.reLoadMap}
-            //                 onPress={this._showDateTimePicker}
-            //             >
-            //                 <Icon style={{ width: 20, height: 20 }} name="md-calendar" />
-            //                 {/* <Text >Timeline</Text> */}
-            //             </Button>
-            //         </Right>
-            //     </Header>
-
-            //     <Animated.ScrollView scrollEventThrottle={5}
-            //         showsVerticalScrollIndicator={false}
-            //         style={{ zIndex: 0 }}
-            //         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: this.scroll } } }], { useNativeDriver: true })}>
-            //         <Animated.View style={{
-            //             height: screenHeight * 0.8,
-            //             width: '100%',
-            //             transform: [{ translateY: Animated.multiply(this.scroll, 0.5) }]
-            //         }}>
-            //             <MapView style={StyleSheet.absoluteFill}
-            //                 provider="google"
-            //                 //showsUserLocation={true}
-            //                 showsMyLocationButton={true}
-            //                 showsCompass={true}
-            //                 followsUserLocation={true}
-            //                 region={this.state.region}
-            //             // onRegionChange={this.onRegionChange}
-            //             >
-
-            //                 <MapView.Marker
-            //                     coordinate={{
-            //                         latitude: this.state.memMarker.latitude,
-            //                         longitude: this.state.memMarker.longitude
-            //                     }}
-            //                     key={id++}
-            //                     pinColor={'violet'}
-            //                 // description={marker.description}
-            //                 // onCalloutPress={() => {
-            //                 //      this.markerClick(marker.Latitude, marker.Longtitude)
-            //                 // }
-            //                 //}
-            //                 />
-
-            //                 {this.state.markers.map(marker => (
-
-            //                     <MapView.Marker
-            //                         coordinate={{
-            //                             latitude: marker.Latitude,
-            //                             longitude: marker.Longtitude
-            //                         }}
-            //                         key={id++}
-            //                     // description={marker.description}
-            //                     // onCalloutPress={() => {
-            //                     //      this.markerClick(marker.Latitude, marker.Longtitude)
-            //                     // }
-            //                     //}
-            //                     >
-            //                         <MapView.Callout
-            //                             onPress={() => {
-            //                                 this.setState({ miniMarker: marker })
-            //                                 console.log(marker)
-            //                             }}
-            //                         //tooltip
-            //                         >
-            //                             <View style={{ width: screenWidth * 0.9 }} >
-            //                                 <Text >{marker.LastUpdate}</Text>
-            //                                 <Text style={{ fontWeight: 'bold', flexWrap: "wrap" }}>{marker.Description}</Text>
-            //                             </View>
-            //                         </MapView.Callout>
-            //                     </MapView.Marker>
-            //                 ))}
-            //             </MapView>
-            //         </Animated.View>
-            //         <View style={{ position: 'absolute', height: screenHeight, width: '100%' }}>
-            //             <LinearGradient
-            //                 colors={['rgba(245,245,245,0.0)', 'rgba(245,245,245,0.35)', 'rgba(245,245,245,1)']}
-            //                 locations={[0, 0.7, 1]}
-            //                 style={StyleSheet.absoluteFill} />
-            //         </View>
-            //         <View style={{
-            //             height: screenHeight * 0.5,
-            //             transform: [{ translateY: -100 }],
-            //             width: screenWidth,
-            //             //paddingHorizontal: 30,
-            //             //paddingVertical: 20,
-            //             backgroundColor: 'transparent',
-
-            //         }}>
-            //             <View style={{ ...StyleSheet.absoluteFillObject, top: 100, backgroundColor: 'rgb(245,245,245)' }} />
-
-            //             <Card style={{ flex: 1 }}>
-            //                 {this.state.markers.length === 0 ? <Text>No data for this day!</Text> :
-            //                     <List
-            //                         dataArray={this.state.markers}
-            //                         //numColumns={1}
-            //                         button={true}
-            //                         renderRow={(item) =>
-
-            //                             <ListItem avatar
-            //                                 button={true}
-            //                                 onPress={() => {
-            //                                     this.setState({
-            //                                         memMarker: {
-            //                                             latitude: item.Latitude,
-            //                                             longitude: item.Longtitude
-            //                                         }
-            //                                     })
-            //                                     // this.showMemberLocation(item.ID)
-
-            //                                 }}
-            //                             >
-            //                                 <Left>
-            //                                     <Icon name='ios-locate-outline' />
-            //                                 </Left>
-            //                                 <Body>
-            //                                     <Text  >{item.Description}</Text>
-            //                                     <Text  >Time: {item.LastUpdate}</Text>
-            //                                     <Text>Battery: {item.Battery}%</Text>
-            //                                 </Body>
-
-            //                                 {/* </Button> */}
-            //                                 {/* <Text>{item.Name}</Text> */}
-            //                             </ListItem>
-            //                         }
-            //                     //keyExtractor={(item, index) => index}
-            //                     >
-            //                     </List>}
-            //             </Card>
-            //             {/* <Content>
-            //                 <Card>
-
-            //                     <CardItem>
-            //                         <Body>
-            //                             <Text>
-            //                                 adds
-            //                             </Text>
-            //                         </Body>
-            //                     </CardItem>
-            //                     <CardItem footer>
-            //                         <Text>asd</Text>
-            //                     </CardItem>
-            //                 </Card>
-            //             </Content> */}
-            //         </View>
-            //     </Animated.ScrollView>
-            //     <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: '#FFF' }} />
-
-
-            // </Container>
-
-
-            <View style={{ flex: 1 }}>
-                <DateTimePicker
-                    date={this.state.curDate}
-                    isVisible={this.state.isDateTimePickerVisible}
-                    maximumDate={new Date()}
-                    onConfirm={this._handleDatePicked}
-                    onCancel={this._hideDateTimePicker}
-                />
-                <Header>
-                    <Left>
-                        <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
-                            <Icon name="md-menu" />
-                        </Button>
-                    </Left>
-                    <Body><Text style={{ color: 'white' }}>My Timeline</Text></Body>
-                    <Right>
-                        <Button
-                            transparent
-                            style={styles.reLoadMap}
-                            onPress={() => {
-                                this.setState({ curDate: new Date() })
-                                this.getLocation()
-                            }}
+                            </Button>
+                            <Button
+                                transparent
+                                style={styles.reLoadMap}
+                                onPress={() => this._handleDatePicked(this.state.curDate)
+                                }
+                            >
+                                <Icon style={{ width: 20, height: 20 }} name="md-calendar" />
+                                {/* <Text >Timeline</Text> */}
+                            </Button>
+                        </Right>
+                    </Header>
+                    <View style={{ width: screenWidth, height: screenHeight * 0.5 }} >
+                        <MapView style={StyleSheet.absoluteFill}
+                            provider="google"
+                            //showsUserLocation={true}
+                            showsMyLocationButton={true}
+                            showsCompass={true}
+                            followsUserLocation={true}
+                            region={this.state.region}
+                        // onRegionChange={this.onRegionChange}
                         >
-                            <Image source={require('../../../assets/today.png')} style={{ width: 20, height: 20 }} tintColor='white' />
+                            {this.state.markers.map(marker => (
+                                <MapView.Marker
+                                    coordinate={{
+                                        latitude: marker.Latitude,
+                                        longitude: marker.Longtitude
+                                    }}
+                                    key={id++}
+                                // description={marker.description}
+                                // onCalloutPress={() => {
+                                //      this.markerClick(marker.Latitude, marker.Longtitude)
+                                // }
+                                //}
+                                >
+                                    <MapView.Callout
+                                    //tooltip
+                                    >
+                                        <View style={{}} >
 
-                        </Button>
-                        <Button
-                            transparent
-                            style={styles.reLoadMap}
-                            onPress={this._showDateTimePicker}
-                        >
-                            <Icon style={{ width: 20, height: 20 }} name="md-calendar" />
-                            {/* <Text >Timeline</Text> */}
-                        </Button>
-                    </Right>
-                </Header>
-                <View style={{ width: screenWidth, height: screenHeight * 0.5 }} >
-                    <MapView style={StyleSheet.absoluteFill}
-                        provider="google"
-                        //showsUserLocation={true}
-                        showsMyLocationButton={true}
-                        showsCompass={true}
-                        followsUserLocation={true}
-                        region={this.state.region}
-                    // onRegionChange={this.onRegionChange}
-                    >
-                        {this.state.markers.map(marker => (
+                                            <View style={{ flexDirection: 'row', }}>
+                                                <Text style={{ fontWeight: 'bold', flexWrap: 'wrap' }}>{marker.Description}</Text>
+                                            </View>
+                                            <Text >{marker.LastUpdate.slice(0, 19).replace('T', ' ')}</Text>
+                                        </View>
+                                    </MapView.Callout>
+                                </MapView.Marker>
+                            ))}
+
                             <MapView.Marker
                                 coordinate={{
-                                    latitude: marker.Latitude,
-                                    longitude: marker.Longtitude
+                                    latitude: this.state.memMarker.latitude,
+                                    longitude: this.state.memMarker.longitude
                                 }}
-                                key={id++}
-                            // description={marker.description}
-                            // onCalloutPress={() => {
-                            //      this.markerClick(marker.Latitude, marker.Longtitude)
-                            // }
-                            //}
+                                key={this.state.memMarker.id}
+                                pinColor={'green'}
+
                             >
-                                <MapView.Callout
-                                //tooltip
-                                >
-                                    <View >
-                                        <Text >{marker.LastUpdate}</Text>
-                                        <Text style={{ fontWeight: 'bold' }}>{marker.Description}</Text>
-                                    </View>
-                                </MapView.Callout>
-                            </MapView.Marker>
-                        ))}
-
-                        <MapView.Marker
-                            coordinate={{
-                                latitude: this.state.memMarker.latitude,
-                                longitude: this.state.memMarker.longitude
-                            }}
-                            key={this.state.memMarker.id}
-                            pinColor={'green'}
-
-                        >
-                            {/* <MapView.Callout
+                                {/* <MapView.Callout
                             
                             > */}
-                            <Card >
-                                <CardItem>
-                                    <Text style={{ fontWeight: 'bold' }}>{this.state.memMarker.des}</Text>
-                                </CardItem>
-                                <CardItem>
-                                    <Icon style={{width:24, height:24}} name="ios-clock-outline" />
-                                    <Text >{this.state.memMarker.LastUpdate}</Text>
-                                </CardItem>
-                                <CardItem>
-                                    <Icon style={{width:24, height:24}} name="md-battery-dead" />
-                                    <Text >{this.state.memMarker.bat}%</Text>
-                                </CardItem>
-                            </Card>
-                            {/* </MapView.Callout> */}
-                        </MapView.Marker>
-                    </MapView>
+
+                                {/* </MapView.Callout> */}
+                            </MapView.Marker>
+                        </MapView>
 
 
-                    <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: '#FFF' }} />
-                </View>
-                <View style={{ flex: 1, }}>
-                    {this.state.markers.length === 0 ? <Text>No data for this day!</Text> :
-                        <FlatList
-                            data={this.state.markers}
-                            //numColumns={1}
-                            //button={true}
+                        <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: '#FFF' }} />
+                    </View>
+                    <View style={{ flex: 1, }}>
+                        {this.state.markers.length === 0 ? <Text>No data for this day!</Text> :
+                            <OptimizedFlatList
+                                data={this.state.markers}
+                                //numColumns={1}
+                                //button={true}
+                                //extraData={this.state}
+                                renderItem={({ item, index }) =>
 
-                            renderItem={({ item, index }) =>
+                                    <FlatListItem item={item} selectedRow={this.state.selectedRow} parentList={this} />
+                                }
+                                keyExtractor={(item) => item.LocationId}
 
-                                <ListItem avatar
-                                    button={true}
-                                    onPress={() => {
-                                        //console.log(item, index)
-                                        this.addMemberMarker(item, index)
-                                        // this.showMemberLocation(item.ID)
+                            >
+                            </OptimizedFlatList>}
+                    </View>
+                </View >
+          
 
-                                    }}
-                                >
-                                    <Left>
-                                        <Icon name='ios-locate-outline' />
-                                    </Left>
-                                    <Body>
-                                        <Text  >{item.Description}</Text>
-                                        <Text  >Time: {item.LastUpdate}</Text>
-                                        <Text>Battery: {item.Battery}%</Text>
-                                    </Body>
-
-                                    {/* </Button> */}
-                                    {/* <Text>{item.Name}</Text> */}
-                                </ListItem>
-                            }
-                            keyExtractor={(item, index) => index}
-
-                        >
-                        </FlatList>}
-                </View>
-            </View >
         );
     }
 }
@@ -580,3 +396,48 @@ const styles = StyleSheet.create({
 
     }
 })
+
+export class FlatListItem extends PureComponent {
+    constructor(props) {
+        super(props)
+        this.state = {
+            selectedRow: this.props.selectedRow,
+            prevSelectedRow: -1
+        }
+    }
+    render() {
+        const item = this.props.item;
+        const index = this.props.index
+        return (
+            <ListItem avatar
+                button={true}
+                selected={true}
+                onPress={() => {
+
+                    this.setState({
+                        selectedRow: item.LocationId
+                    })
+                    //console.log(this.state.selectedRow)
+                    //console.log(item, index)
+                    this.props.parentList.addMemberMarker(item)
+                    // this.showMemberLocation(item.ID)
+                    // this.setState({
+                    //     prevSelectedRow: index
+                    // })
+                }}
+
+            >
+                <Left >
+                    <Icon name='ios-locate-outline' />
+                </Left>
+                <Body >
+                    <Text style={this.state.selectedRow === item.LocationId ? { fontWeight: 'bold' } : { fontWeight: 'normal' }} >{item.Description}</Text>
+                    <Text  >Time: {item.LastUpdate.slice(0, 19).replace('T', ' ')} -+-{item.LocationId}</Text>
+                </Body>
+
+                {/* </Button> */}
+                {/* <Text>{item.Name}</Text> */}
+            </ListItem>
+        );
+    }
+}

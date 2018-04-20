@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, AppState, View, PermissionsAndroid, Dimensions, Image, TouchableWithoutFeedback, TouchableOpacity, AsyncStorage, FlatList } from 'react-native';
+import { BackHandler, StyleSheet, AppState, View, PermissionsAndroid, Dimensions, Image, Alert, TouchableWithoutFeedback, TouchableOpacity, AsyncStorage, FlatList } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import {
     Container,
@@ -24,6 +24,13 @@ import MapViewDirections from 'react-native-maps-directions'
 import call from 'react-native-phone-call'
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import geolib from 'geolib'
+import FCM, {
+    FCMEvent,
+    RemoteNotificationResult,
+    WillPresentNotificationResult,
+    NotificationType
+} from "react-native-fcm";
+import { userId, mainColor } from '../Common/User'
 
 
 
@@ -46,6 +53,7 @@ export default class ShareDetail extends Component {
 
     constructor(props) {
         super(props);
+
         this.state = {
             listMembers: [],
             markerInfor: '',
@@ -85,7 +93,7 @@ export default class ShareDetail extends Component {
                     }
                 })
             },
-            (error) => console.log(new Date(), error),
+            // (error) => console.log(new Date(), error),
             { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
         );
 
@@ -125,7 +133,7 @@ export default class ShareDetail extends Component {
             .then((responseJson) => {
                 this.setState({ listMembers: responseJson.gr, visible: false })
                 //console.log(this.state.listMembers)
-               
+
             })
             .catch((error) => {
                 //console.log(error);
@@ -145,7 +153,7 @@ export default class ShareDetail extends Component {
             .then((response) => response.json())
             .then((responseJson) => {
                 this.setState({ markers: responseJson, visible: false })
-                console.log(this.state.markers)
+                //console.log(responseJson)
                 this.onRegionChange(responseJson)
                 //this.addMarker(responseJson)
             })
@@ -203,11 +211,22 @@ export default class ShareDetail extends Component {
                 console.log(error);
             })
     }
-
+    showLocalNotification(notif) {
+        FCM.presentLocalNotification({
+            title: 'My GPS',
+            body: notif.fcm.body,
+            priority: "high",
+            click_action: 'Detail',
+            show_in_foreground: true,
+            local: true
+        });
+    }
     componentDidMount() {
+
         this._getRandomColor();
+        //console.log(this.props.navigation.state.params.detail.ID)
         this.getListMember(this.props.navigation.state.params.detail.ID);
-        this.showAllMemberLocation(2)
+        this.showAllMemberLocation(this.props.navigation.state.params.detail.ID)
 
         PushNotification.configure({
             // (required) Called when a remote or local notification is opened or received
@@ -231,70 +250,7 @@ export default class ShareDetail extends Component {
     handleNotification(radius, idUser, minute) {
         console.log(this.state.defaultLat, radius, minute)
         this.setState({ radius: radius })
-        //this.setState({radius:radius})
-        // geolib.isPointInCircle(
-        //     { latitude: this.state.memLat, longitude: this.state.memLong },
-        //     { latitude: this.state.defaultLat, longitude: this.state.defaultLng }, radius
-        // ) ? alert('true') : alert('false')
-        // this.handleAppStateChange()
 
-
-        //this.showMemberLocation(idUser);
-
-
-
-        // BackgroundJob.register({
-        //     jobKey: "myJob",
-        //     job: () => {
-        //         let status;
-        //         this.showMemberLocation(idUser);
-        //         if (geolib.isPointInCircle(
-        //             { latitude: this.state.memLat, longitude: this.state.memLong },
-        //             { latitude: this.state.defaultLat, longitude: this.state.defaultLng }, this.state.radius
-        //         ))
-        //         // PushNotification.localNotification({
-        //         //     id: idUser,
-        //         //     message:
-        //         //         'In side'
-        //         //     , // (required)
-        //         //     // in 60 secs, // set Date TIme,
-        //         //     autoCancel: true,
-
-        //         // });
-        //         status='in'
-
-        //         else
-        //         // PushNotification.localNotification({
-        //         //     id: idUser,
-        //         //     message:
-        //         //         'Out side'
-        //         //     , // (required)
-        //         //     // in 60 secs, // set Date TIme,
-        //         //     autoCancel: true,
-
-        //         // });
-        //         status='out'
-        //        // console.log(this.state.status)
-
-        //        PushNotification.localNotificationSchedule({
-        //             id: idUser,
-        //             message:
-        //                status
-        //             , // (required)
-        //             date: new Date(Date.now() + (minute*60000)),
-        //             // in 60 secs, // set Date TIme,
-        //             autoCancel: true,
-
-        //         });
-        //     }
-        // });
-        // BackgroundJob.schedule({
-        //     jobKey: "myJob",
-        //     period: 3000,
-        //     allowExecutionInForeground: true,
-        //     allowWhileIdle :true,
-
-        // });
     }
 
 
@@ -310,19 +266,74 @@ export default class ShareDetail extends Component {
 
 
     render() {
+        BackHandler.addEventListener('hardwareBackPress', function () {
+            // this.onMainScreen and this.goBack are just examples, you need to use your own implementation here
+            // Typically you would use the navigator here to go to the last state.
+            if (!this) {
+                this.props.navigation.navigate('IndexShare')
+                return true;
+            }
+            return false;
+        }
+        );
         return (
             <Container style={{ flex: 1 }}>
-                <Header  >
+                <Header androidStatusBarColor={mainColor} style={{ backgroundColor: mainColor }} >
                     <Left>
                         <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
                             <Icon name="md-menu" />
                         </Button>
                     </Left>
                     <Body><Text style={{ color: 'white' }}>{this.props.navigation.state.params.detail.Name}</Text></Body>
-                   
+                    <Right>
+                        <Button transparent
+                            onPress={() => {
+                                Alert.alert(
+                                    'Location Sharing ',
+                                    'Are you sure to share your location to this group?',
+                                    [
+                                        { text: 'Cancel', onPress: () => { }, style: 'cancel' },
+                                        {
+                                            text: 'OK', onPress: () => {
+
+                                                fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/notification', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        Accept: 'application/json',
+                                                        'Content-Type': 'application/json',
+                                                        'token': 'vjJZjABwEjPfT9KGmxelkp3CYEgsTJjVrPnRbWRWHTe4Ddy_4O26dqIfqgbQuiO6a4ZeW4EBRsPBl__UfgzeSnSahh1'
+                                                    },
+                                                    body: JSON.stringify({
+                                                        userId: userId,
+                                                        message: "I am here",
+                                                        groupId: this.props.navigation.state.params.detail.ID
+
+                                                    }),
+
+                                                })
+                                                    .then((response) => response.json())
+                                                    .then((responseJson) => {
+                                                        alert("Share success!")
+                                                        //console.log(responseJson)
+                                                    })
+                                                    .catch((error) => {
+
+                                                        console.log(error);
+                                                    })
+                                            }
+                                        },
+                                    ],
+                                    { cancelable: true }
+                                )
+
+                            }}
+                        >
+                            <Icon style={{ width: 30, height: 30 }} name='md-share-alt' />
+                        </Button>
+                    </Right>
                 </Header>
-                <Card style={{ flex: 2 }} >
-                    <MapView style={styles.map}
+                <Container style={{ flex: 1 }} >
+                    <MapView.Animated style={StyleSheet.absoluteFill}
                         provider="google"
                         showsUserLocation={true}
                         showsMyLocationButton={true}
@@ -338,14 +349,14 @@ export default class ShareDetail extends Component {
                             destination={this.state.destination}
                             apikey='AIzaSyC9vBvydW5J7JJsnQS_do_tKmLlzdCHA4k'
                         />
-                        {this.state.markers.map(marker => (
+                        {this.state.markers.map !== undefined ? this.state.markers.map(marker => (
                             <MapView.Marker
                                 coordinate={{
                                     latitude: marker.Latitude,
                                     longitude: marker.Longtitude,
                                 }}
                                 key={marker.UserId}
-                                pinColor={this._getRandomColor()}
+                                pinColor={'red'}
                             // description={marker.description}
                             // onCalloutPress={() => {
                             //      this.markerClick(marker.Latitude, marker.Longtitude)
@@ -357,14 +368,13 @@ export default class ShareDetail extends Component {
                                 >
                                     <View >
                                         <Text style={{ fontWeight: 'bold' }} >{marker.FullName}</Text>
-                                        <Text >{marker.Description}</Text>
-                                        <Text >Last update: {marker.LastUpdate}</Text>
-                                        <Text >Battery: {marker.Battery}%</Text>
+                                        <View style={{ flexDirection: 'row' }}><Text style={{ flexWrap: 'wrap' }} >{marker.Description}</Text></View>
+                                        <Text >Last update: {marker.LastUpdate.slice(0, 19).replace('T', ' ')}</Text>
 
                                     </View>
                                 </MapView.Callout>
                             </MapView.Marker>
-                        ))}
+                        )) : <Text></Text>}
 
                         {/* {this.state.markers.map(marker => (
 
@@ -396,65 +406,58 @@ export default class ShareDetail extends Component {
                         ))} */}
 
                         {/* <MapView.Maker onPress={() => {this.setState({selectedMarker: markerId})}} /> */}
-                    </MapView>
+                    </MapView.Animated>
 
                     {/* </View> */}
                     <Spinner visible={this.state.visible} textContent={"Loading..."} textStyle={{ color: '#FFF' }} />
 
-                </Card>
-                <Card style={{ flex: 1 }}>
-                    <List
-                        dataArray={this.state.markers}
-                        //numColumns={1}
-                        button={true}
-                        renderRow={(item) =>
+                </Container>
 
-                            <ListItem avatar
-                            >
+                <List
+                    dataArray={this.state.markers}
+                    //numColumns={1}
+                    key={id++}
+                    button={true}
+
+                    renderRow={(item) =>
+
+                        <TouchableOpacity
+                            onPress={() => this.setState({
+                                region: {
+                                    latitude: item.Latitude,
+                                    longitude: item.Longtitude,
+                                    latitudeDelta,
+                                    longitudeDelta
+                                }
+                            })}>
                             <Card>
-                            <CardItem>
-                                <Left>
-                                    <Icon name='ios-person' />
-                                
-                                <Body>
-                                    <Text  >{item.FullName}</Text>
-                                    <Text  >Description: {item.Description}</Text>
-                                </Body>
-                               </Left>
-                                
-                                </CardItem>
-                                
-                                    <CardItem>
-                                        <Left>
-                                        {parseInt(item.Battery) > 20 ?
-                                            <Button iconLeft success>
-                                                <Icon name='ios-battery-full' />
-                                                <Text>{item.Battery}%</Text>
-                                            </Button> :
-                                            <Button iconLeft danger>
-                                                <Icon name='ios-battery-dead' />
-                                                <Text>{item.Battery}%</Text>
-                                            </Button>
-                                        }
-                                        </Left>
+                                <CardItem>
+                                    <Left>
+                                        <Image style={{ width: 36, height: 36 }} source={require('../../../assets/icon-user.png')} />
+
                                         <Body>
-                                        <Button transparent
-                                           
-                                            onPress={() => {
-                                                this.setState({
-                                                    destination: {
-                                                        latitude: item.Latitude,
-                                                        longitude: item.Longtitude
-                                                    }
-                                                })
-                                            }}
-                                        >
-                                            <Image style={{ width: 48, height: 48 }} source={require('../../../assets/direction.png')} />
-                                        </Button>
+                                            <Text  >{item.FullName}</Text>
+                                            <Text  >Description: {item.Description}</Text>
                                         </Body>
-                                        <Right>
-                                        <Button info iconLeft
-                                           
+                                    </Left>
+
+                                </CardItem>
+
+                                <CardItem>
+
+                                    {parseInt(item.Battery) > 20 ?
+                                        <Left>
+                                            <Icon name='ios-battery-full' style={{ color: 'green' }} />
+                                            <Text>{item.Battery}%</Text></Left>
+                                        :
+                                        <Left>
+                                            <Icon name='ios-battery-dead' style={{ color: 'red' }} />
+                                            <Text>{item.Battery}%</Text></Left>
+
+                                    }
+                                    <Right>
+                                        {item.UserId !== userId ? <Button iconLeft bordered
+                                            style={{ borderColor: mainColor }}
                                             onPress={() => {
                                                 this.setState({
                                                     destination: {
@@ -464,20 +467,18 @@ export default class ShareDetail extends Component {
                                                 })
                                             }}
                                         >
-                                            <Icon name="ios-share-alt" />
-                                            <Text>Share</Text>
-                                        </Button>
-                                        </Right>
-                                    </CardItem>
-                                    </Card>
-                                {/* </Button> */}
-                                {/* <Text>{item.Name}</Text> */}
-                            </ListItem>
-                        }
-                    //keyExtractor={(item, index) => index}
-                    >
-                    </List>
-                </Card>
+                                            <Image style={{ width: 24, height: 24, tintColor: mainColor, marginLeft: 5 }} source={require('../../../assets/direction.png')} />
+                                            <Text style={{ color: mainColor }}>Direction</Text>
+                                        </Button> : <Text style={{ fontWeight: 'bold', marginLeft: 30 }}>It's you.</Text>}
+                                    </Right>
+                                </CardItem>
+                            </Card>
+                        </TouchableOpacity>
+                    }
+                //keyExtractor={(item, index) => index}
+                >
+                </List>
+
 
 
             </Container >
