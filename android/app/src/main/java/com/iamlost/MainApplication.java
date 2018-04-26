@@ -3,6 +3,7 @@ package com.iamlost;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.marianhello.bgloc.react.BackgroundGeolocationPackage;
 import com.evollu.react.fcm.FIRMessagingPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.robinpowered.react.battery.DeviceBatteryPackage;
@@ -34,6 +35,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new BackgroundGeolocationPackage(),
             new FIRMessagingPackage(),
             new LinearGradientPackage(),         
             new DeviceBatteryPackage(),

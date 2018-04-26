@@ -1,5 +1,5 @@
 import React, { Component, PureComponent } from 'react';
-import { BackHandler,Animated, StyleSheet, View, PermissionsAndroid, Image, TouchableOpacity, StatusBar, NativeModules, AsyncStorage, Promise, Dimensions, Alert } from 'react-native';
+import { BackHandler, Animated, StyleSheet, View, PermissionsAndroid, Image, TouchableOpacity, StatusBar, NativeModules, AsyncStorage, Promise, Dimensions, Alert } from 'react-native';
 import { StackNavigator, NavigationActions } from 'react-navigation';
 import MapView from 'react-native-maps'
 import VirtualLocation from './VirtualLocation'
@@ -7,6 +7,7 @@ import haversine from 'haversine';
 import DeviceBattery from 'react-native-device-battery';
 import LinearGradient from 'react-native-linear-gradient'
 import { userId, mainColor } from '../Common/User'
+import BackgroundGeolocation from 'react-native-mauron85-background-geolocation';
 import {
   Container,
   Header,
@@ -24,6 +25,7 @@ import {
 import FireBase from '../FireBase'
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window')
 let id = 0; latitude = 0; longitude = 0;
+
 let state = {
   distance: 0,
   speed: 0.00,
@@ -47,14 +49,8 @@ export default class DisplayMap extends PureComponent {
       return <Icon name="map" style={{ color: tintColor }} />
     },
     title: 'Tracking Me',
-    headerTitle: "aaa",
-    headerRight: (
-      <Button
-        onPress={() => alert('This is a button!')}
-        title="Info"
-        color="#fff"
-      />
-    ),
+
+
   };
 
   async componentDidMount() {
@@ -62,9 +58,7 @@ export default class DisplayMap extends PureComponent {
     FCM.requestPermissions();
 
     await FCM.getFCMToken().then(token => {
-      // alert(token);
-      //console.log("TOKEN (getFCMToken)", token);
-      //this.setState({ token: token });
+
       fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/FCM', {
         method: 'PUT',
         headers: {
@@ -157,39 +151,11 @@ export default class DisplayMap extends PureComponent {
 
     const nDay = new Date();
     this.setState({ nowTime: nDay.getHours() + ":" + nDay.getMinutes() });
-    await navigator.geolocation.getCurrentPosition(
-      (position) => {
-        latitude = position.coords.latitude,
-          longitude = position.coords.longitude
-        this.setState({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        })
-        try {
-          AsyncStorage.setItem('latitude', this.state.latitude);
-
-        } catch (error) {
-          // Error saving data
-        }
-        try {
-          AsyncStorage.setItem('longitude', this.state.longitude);
-
-        } catch (error) {
-          // Error saving data
-        }
-
-
-        console.log(position);
-
-      },
-      (error) => console.log(new Date(), error),
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
-    )
-    this.getCurLocation();
-
+    
     DeviceBattery.getBatteryLevel().then(level => {
       this.setState({ battery: level }) // between 0 and 1
     }).catch(reject => console.log(reject))
+
 
 
   }
@@ -203,36 +169,60 @@ export default class DisplayMap extends PureComponent {
       local: true
     });
   }
+  componentWillUnmount() {
+    BackgroundGeolocation.events.forEach(event => BackgroundGeolocation.removeAllListeners(event));
+  }
   constructor(props) {
     super(props);
-
-    // this.getInitialState()
-    // this.state = {
-    //   distance: 0,
-    //   speed: 0.00,
-    //   direction: '',
-    // }
     this.state = state;
+    BackgroundGeolocation.configure({
+      desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
+      stationaryRadius: 50,
+      distanceFilter: 30,
+      notificationTitle: 'My-GPS location',
+      notificationText: 'Working',
+      debug: true,
+      startOnBoot: false,
+      stopOnTerminate: false,
+      locationProvider: BackgroundGeolocation.ACTIVITY_PROVIDER,
+      interval: 60000,
+      fastestInterval: 15000,
+      activitiesInterval: 30000,
+      stopOnStillActivity: false,
+      url: 'http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location',
+      httpHeaders: {
+        'token': 'vjJZjABwEjPfT9KGmxelkp3CYEgsTJjVrPnRbWRWHTe4Ddy_4O26dqIfqgbQuiO6a4ZeW4EBRsPBl__UfgzeSnSahh1'
+      },
+      // customize post properties
+      postTemplate: {
+        latitude:'@latitude',
+        longtitude: '@longitude',
+      }
+    });
 
-
-
-    let watchID = navigator.geolocation.watchPosition((position) => {
-      AsyncStorage.setItem('curLocation', position.coords)
+    BackgroundGeolocation.on('location', (location) => {
+      console.log(location);
+      latitude = location.latitude,
+        longitude = location.longitude
+      this.setState({
+        latitude: location.latitude,
+        longitude: location.longitude
+      })
       this.setState({
         marker1:
           {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+            latitude: location.latitude,
+            longitude: location.longitude
           }
       })
-      if (position !== null) this.onRegionChange(position.coords)
+      if (location !== null) this.onRegionChange(location)
       let distance = 0;
       if (this.state.preCoords) {
-        distance = this.state.distance + haversine(this.state.preCoords, position.coords, { unit: 'meter' }),
+        distance = this.state.distance + haversine(this.state.preCoords, location, { unit: 'meter' }),
           this.setState({ distance: distance })
       }
 
-      let x = position.coords.heading;
+      let x = location.bearing;
       if ((x > 0 && x <= 23) || (x > 338 && x <= 360))
         this.setState({ direction: 'N' });
       else if ((x > 23 && x <= 65))
@@ -249,35 +239,36 @@ export default class DisplayMap extends PureComponent {
         this.setState({ direction: 'W' });
       else if ((x > 293 && x <= 338))
         this.setState({ direction: 'NW' });
-      this.postLocation(userId, position.coords.latitude, position.coords.longitude, position.timestamp);
+      //this.postLocation(userId, position.coords.latitude, position.coords.longitude, position.timestamp);
 
       this.setState({
         markers: [
           ...this.state.markers, {
-            coordinate: position.coords,
+            coordinate: location,
             key: id++
           }
         ],
-        preCoords: position.coords,
+        preCoords: location,
         distance
 
       }, null, { distanceFiler: 5 }
       ),
         this.setState({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          speed: position.coords.speed
+          latitude: location.latitude,
+          longitude: location.longitude,
+          speed: location.speed
 
         })
+      this.postLocation(userId, location.latitude, location.longitude, location.time);
+    });
+   
 
-    },
-    );
-    this.state = { markers: [], watchID }
+    BackgroundGeolocation.start();
+
+    this.state = { markers: [] }
 
   }
-  // getBatteryLevel = (callback) => {
-  //   NativeModules.BatteryStatus.getBatteryStatus(callback);
-  // }
+
   async getCurLocation() {
     await AsyncStorage.getItem('latitude').then(latitude => latitude = latitude).catch(reject => console.log(reject));
     await AsyncStorage.getItem('longitude').then(longitude => longitude).catch(reject => console.log(reject));;
@@ -302,13 +293,11 @@ export default class DisplayMap extends PureComponent {
     let latlng = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latitude + "," + longitude + "&sensor=true&key=AIzaSyBAKmIRhHy16oixr-Suxus0p7fkZqs2e7w"
     await fetch(latlng).then((response) => response.json())
       .then((responseJson) => {
-        // this.setState({ markerInfor: responseJson.results[0].formatted_address })
-        // console.log(this.state.markerInfor)
         this.setState({ des: responseJson.results[0].formatted_address })
-        console.log(des)
+
       })
       .catch((error) => {
-        console.log(error);
+
       })
 
 
@@ -327,12 +316,10 @@ export default class DisplayMap extends PureComponent {
         Battery: parseInt(this.state.battery * 100),
         Description: this.state.des
       }),
-
     })
       .then((response) => response.json())
       .then((responseJson) => {
-
-        console.log(responseJson)
+        //console.log(n)
       })
       .catch((error) => {
 
@@ -369,7 +356,7 @@ export default class DisplayMap extends PureComponent {
     state = this.state;
   }
   render() {
-    
+
     return (
       <Container style={StyleSheet.absoluteFill}>
         <Header androidStatusBarColor={mainColor} style={{ backgroundColor: mainColor }}>

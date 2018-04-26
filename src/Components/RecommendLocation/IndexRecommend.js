@@ -1,103 +1,87 @@
-import React, { Component, PureComponent } from 'react';
-import { Animated, StyleSheet, View, PermissionsAndroid, Image, TouchableOpacity, StatusBar, NativeModules, AsyncStorage, Promise, Dimensions } from 'react-native';
+import React, { Component } from 'react';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { StackNavigator } from 'react-navigation';
-import MapView from 'react-native-maps'
-import LinearGradient from 'react-native-linear-gradient'
-import { userId, mainColor } from '../Common/User'
-import {
-    Container,
-    Header,
-    Title,
-    Content,
-    Button,
-    Icon,
-    ListItem,
-    Text,
-    Left,
-    Right,
-    Body,
-    Item, Card, CardItem
-} from 'native-base';
-
-
-export default class IndexRecommend extends Component {
+import { Container, Header, Content, List, ListItem, Text, Left, Body, Icon, Button } from 'native-base';
+//import Icon from 'react-native-vector-icons/FontAwesome';
+import { mainColor } from '../Common/User'
+import ListPlaces from './ListPlaces'
+import DetailPlace from './DetailPlace'
+import RecommendationsMap from './RecommendationsMap'
+export class IndexRecommend extends Component {
     constructor(props) {
         super(props);
-
-        // this.getInitialState()
-        // this.state = {
-        //   distance: 0,
-        //   speed: 0.00,
-        //   direction: '',
-        // }
-
+        this.state = {
+            bgColor: [
+                'red',
+                'blue',
+                'yellow',
+                'green',
+                'violet',
+                'purple',
+                'pink',
+                'orange',
+               
+            ],
+        }
     }
-
-
-    async componentWillMount() {
-        watchID = await navigator.geolocation.watchPosition((position) => {
-            let region = {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-                latitudeDelta: 0.00922 * 1.5,
-                longitudeDelta: 0.00421 * 1.5
-            }
-
-            this.onRegionChange(region, position.coords.accuracy);
-        });
-    }
-
-    componentWillUnmount() {
-        navigator.geolocation.clearWatch(this.watchID);
-    }
-
-    onRegionChange(region, gpsAccuracy) {
-        //this.fetchVenues(region);
-
-        this.setState({
-            mapRegion: region,
-            gpsAccuracy: gpsAccuracy || this.state.gpsAccuracy
-        });
+    _getRandomColor() {
+        var item = this.state.bgColor[Math.floor(Math.random() * this.state.bgColor.length)];
+        return item
     }
     render() {
-        //const { mapRegion, lookingFor } = this.state;
-
-
         return (
-            <View style={{ flex: 1 }}>
-            {/* //     <MapView.Animated
-            //         provider="google"
-            //         style={StyleSheet.absoluteFill}
-            //         showsUserLocation={true}
-            //         showsCompass={true}
-            //         showsMyLocationButton={true}
-            //         followsUserLocation={true}
-            //         region={{
-            //             latitude: 16.0585026,
-            //             longitude: 108.2199589,
-            //             latitudeDelta: 0.09,
-            //             longitudeDelta: 0.09
-            //         }}
-            //         //style={styles.fullscreen}
-            //         onRegionChange={this.onRegionChange}>
-            //     </MapView.Animated> */}
-            <Text>CHUA LAM</Text>
-            </View >
+            <Container>
+                <Header androidStatusBarColor={mainColor} style={{ backgroundColor: mainColor }}>
+                    <Left>
+                        <Button transparent onPress={() => this.props.navigation.navigate('DrawerOpen')}>
+                            <Icon name="md-menu" />
+                        </Button>
+                    </Left>
+                    <Body>
+                        <Text style={{ color: 'white' }}>Choose your place</Text>
+                    </Body>
+
+
+                </Header>
+                <Content>
+                    <List
+                        dataArray={ListPlaces}
+                        key={(item) => item.key}
+                        button={true}
+                        renderRow={(item) =>
+
+                            <ListItem icon
+                                button={true}
+                                onPress={() => this.props.navigation.navigate('RecommendationsMap', { item: item })}
+                            >
+                                <Left>
+                                    <Icon style={{ color: this._getRandomColor() }} name={item.icon} />
+                                </Left>
+                                <Body>
+                                    <Text>{item.name}</Text>
+                                </Body>
+                            </ListItem>
+                        }
+
+                    >
+                    </List>
+                </Content>
+            </Container>
         );
-
-
     }
 }
-const styles = StyleSheet.create({
-    fullscreen: {
-        flex: 1,
+
+export default recommendStack = StackNavigator({
+    IndexRecommend: {
+        screen: IndexRecommend
     },
-    centered: {
-        justifyContent: 'center',
-        alignItems: 'center'
+    RecommendationsMap: {
+        screen: RecommendationsMap
     },
-    mapHeader: {
-        backgroundColor: "rgba(255, 255, 255, .7)",
-        paddingTop: 20
+    DetailPlace:{
+        screen:DetailPlace
     }
-});
+}, {
+        headerMode: 'none'
+    }
+)

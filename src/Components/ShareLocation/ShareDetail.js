@@ -82,20 +82,19 @@ export default class ShareDetail extends Component {
             ],
 
         }
-        navigator.geolocation.getCurrentPosition(
+        let watchLoc = navigator.geolocation.getCurrentPosition(
             (position) => {
-                //this.setState({latitude:position.coords.latitude, longitude:position.coords.longitude})
-                //console.log(position);
                 this.setState({
                     origin: {
                         latitude: position.coords.latitude,
                         longitude: position.coords.longitude
                     }
                 })
+                console.log(this.state.origin)
             },
-            // (error) => console.log(new Date(), error),
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 3000 }
-        );
+            (error) => console.log(error),
+            { enableHighAccuracy: true, timeout: 2000 }
+        )
 
     }
     onRegionChange(region) {
@@ -221,7 +220,7 @@ export default class ShareDetail extends Component {
             local: true
         });
     }
-    componentDidMount() {
+    async componentDidMount() {
 
         this._getRandomColor();
         //console.log(this.props.navigation.state.params.detail.ID)
@@ -245,6 +244,8 @@ export default class ShareDetail extends Component {
               */
             requestPermissions: true,
         });
+
+
     }
 
     handleNotification(radius, idUser, minute) {
@@ -465,6 +466,7 @@ export default class ShareDetail extends Component {
                                                         longitude: item.Longtitude
                                                     }
                                                 })
+                                                console.log(this.state.destination)
                                             }}
                                         >
                                             <Image style={{ width: 24, height: 24, tintColor: mainColor, marginLeft: 5 }} source={require('../../../assets/direction.png')} />

@@ -75,7 +75,7 @@ export default class MyTimeLine extends PureComponent {
         var tzoffset = (new Date()).getTimezoneOffset() * 60000;
         var n = new Date(d - tzoffset).toISOString().slice(0, 19).replace('T', ' ');
         console.log('fetch', n)
-        fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location?id=2&&day=' + n, {
+        fetch('http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location?id=3&&day=' + n, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -197,7 +197,7 @@ export default class MyTimeLine extends PureComponent {
                 //month+=1;
 
                 console.log(bd)
-                let dayApi = "http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location?id=2&&day=" + bd;
+                let dayApi = "http://ec2-52-87-221-34.compute-1.amazonaws.com/api/location?id=3&&day=" + bd;
                 //this.setState({ textBirthDay: bd })
                 //console.log('A date has been picked: ', this.state.textBirthDay);
                 //this.setState({ visible: true })

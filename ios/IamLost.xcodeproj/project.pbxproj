@@ -59,6 +59,11 @@
 		C7B435D13F944C11A59C5842 /* libDeviceBattery.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 373405E9752D4C4B8D3A6C1C /* libDeviceBattery.a */; };
 		61A630826E474FF491E1F9A4 /* libRNFIRMessaging.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E7D36448B97F42C18AF45D71 /* libRNFIRMessaging.a */; };
 		11255D7CAE37471DBF47533E /* libBVLinearGradient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AD0DB92A9874FE88C4BB339 /* libBVLinearGradient.a */; };
+		E155804A087B44DEAD15458E /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECE71219525E484EA549DEBF /* libRCTActionSheet.a */; };
+		9E9B919C7BAE4870B1F034DE /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 46958CCCC0F24A01B5D008D8 /* libRNVectorIcons.a */; };
+		2FD798EAFF7444B49BEDB2F9 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F7C6F64D34B2428BB846AC11 /* Feather.ttf */; };
+		CA849BED95FC4B88905A3CE7 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 115E94C68A88451592D8F584 /* MaterialCommunityIcons.ttf */; };
+		03D00D8548D04DC1926AC160 /* libBackgroundGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 98BD3A27643C4FAC9642393A /* libBackgroundGeolocation.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -341,6 +346,14 @@
 		E7D36448B97F42C18AF45D71 /* libRNFIRMessaging.a */ = {isa = PBXFileReference; name = "libRNFIRMessaging.a"; path = "libRNFIRMessaging.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		D2F136B3C5924C8EAAA354C2 /* BVLinearGradient.xcodeproj */ = {isa = PBXFileReference; name = "BVLinearGradient.xcodeproj"; path = "../node_modules/react-native-linear-gradient/BVLinearGradient.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		9AD0DB92A9874FE88C4BB339 /* libBVLinearGradient.a */ = {isa = PBXFileReference; name = "libBVLinearGradient.a"; path = "libBVLinearGradient.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		42F0BDF04B154FE599466F35 /* StarRatingViewDemo.xcodeproj */ = {isa = PBXFileReference; name = "StarRatingViewDemo.xcodeproj"; path = "../node_modules/react-native-star-rating-view/Demo/StarRatingViewDemo/ios/StarRatingViewDemo.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		ECE71219525E484EA549DEBF /* libRCTActionSheet.a */ = {isa = PBXFileReference; name = "libRCTActionSheet.a"; path = "libRCTActionSheet.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		9155D470C70144BA93113139 /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; name = "RNVectorIcons.xcodeproj"; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		46958CCCC0F24A01B5D008D8 /* libRNVectorIcons.a */ = {isa = PBXFileReference; name = "libRNVectorIcons.a"; path = "libRNVectorIcons.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		F7C6F64D34B2428BB846AC11 /* Feather.ttf */ = {isa = PBXFileReference; name = "Feather.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		115E94C68A88451592D8F584 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; name = "MaterialCommunityIcons.ttf"; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		EFF94E15922942908CF3BE13 /* RCTBackgroundGeolocation.xcodeproj */ = {isa = PBXFileReference; name = "RCTBackgroundGeolocation.xcodeproj"; path = "../node_modules/react-native-mauron85-background-geolocation/ios/RCTBackgroundGeolocation.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		98BD3A27643C4FAC9642393A /* libBackgroundGeolocation.a */ = {isa = PBXFileReference; name = "libBackgroundGeolocation.a"; path = "libBackgroundGeolocation.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -380,6 +393,9 @@
 				C7B435D13F944C11A59C5842 /* libDeviceBattery.a in Frameworks */,
 				61A630826E474FF491E1F9A4 /* libRNFIRMessaging.a in Frameworks */,
 				11255D7CAE37471DBF47533E /* libBVLinearGradient.a in Frameworks */,
+				E155804A087B44DEAD15458E /* libRCTActionSheet.a in Frameworks */,
+				9E9B919C7BAE4870B1F034DE /* libRNVectorIcons.a in Frameworks */,
+				03D00D8548D04DC1926AC160 /* libBackgroundGeolocation.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -567,6 +583,9 @@
 				AAE62EC7B4AA46469AF7EFE9 /* DeviceBattery.xcodeproj */,
 				3C5D8F5CAE8B419AB63CFB57 /* RNFIRMessaging.xcodeproj */,
 				D2F136B3C5924C8EAAA354C2 /* BVLinearGradient.xcodeproj */,
+				42F0BDF04B154FE599466F35 /* StarRatingViewDemo.xcodeproj */,
+				9155D470C70144BA93113139 /* RNVectorIcons.xcodeproj */,
+				EFF94E15922942908CF3BE13 /* RCTBackgroundGeolocation.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -630,6 +649,8 @@
 				9C7D2615EED74CE2B603646C /* rubicon-icon-font.ttf */,
 				243AA7D64B92428BBC62AE48 /* SimpleLineIcons.ttf */,
 				BD66BC242AD647CDAB148000 /* Zocial.ttf */,
+				F7C6F64D34B2428BB846AC11 /* Feather.ttf */,
+				115E94C68A88451592D8F584 /* MaterialCommunityIcons.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1037,6 +1058,8 @@
 				D8103E8F9BEC4066BD83C027 /* rubicon-icon-font.ttf in Resources */,
 				62997FD369F5470DA45FB0B4 /* SimpleLineIcons.ttf in Resources */,
 				8E15EC2EC2024E16BDADD33C /* Zocial.ttf in Resources */,
+				2FD798EAFF7444B49BEDB2F9 /* Feather.ttf in Resources */,
+				CA849BED95FC4B88905A3CE7 /* MaterialCommunityIcons.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1181,6 +1204,9 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1194,6 +1220,9 @@
 					"$(SRCROOT)\..\node_modules\react-native-device-battery\ios\DeviceBattery",
 					"$(SRCROOT)\..\node_modules\react-native-fcm\ios",
 					"$(SRCROOT)\..\node_modules\react-native-linear-gradient\BVLinearGradient",
+					"$(SRCROOT)\..\node_modules\react-native-star-rating-view\Demo\StarRatingViewDemo\ios\StarRatingViewDemo",
+					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
+					"$(SRCROOT)\..\node_modules\react-native-mauron85-background-geolocation\ios\RCTBackgroundGeolocation/**",
 				);
 			};
 			name = Debug;
@@ -1225,6 +1254,9 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1238,6 +1270,9 @@
 					"$(SRCROOT)\..\node_modules\react-native-device-battery\ios\DeviceBattery",
 					"$(SRCROOT)\..\node_modules\react-native-fcm\ios",
 					"$(SRCROOT)\..\node_modules\react-native-linear-gradient\BVLinearGradient",
+					"$(SRCROOT)\..\node_modules\react-native-star-rating-view\Demo\StarRatingViewDemo\ios\StarRatingViewDemo",
+					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
+					"$(SRCROOT)\..\node_modules\react-native-mauron85-background-geolocation\ios\RCTBackgroundGeolocation/**",
 				);
 			};
 			name = Release;
@@ -1269,6 +1304,9 @@
 					"$(SRCROOT)\..\node_modules\react-native-device-battery\ios\DeviceBattery",
 					"$(SRCROOT)\..\node_modules\react-native-fcm\ios",
 					"$(SRCROOT)\..\node_modules\react-native-linear-gradient\BVLinearGradient",
+					"$(SRCROOT)\..\node_modules\react-native-star-rating-view\Demo\StarRatingViewDemo\ios\StarRatingViewDemo",
+					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
+					"$(SRCROOT)\..\node_modules\react-native-mauron85-background-geolocation\ios\RCTBackgroundGeolocation/**",
 				);
 			};
 			name = Debug;
@@ -1299,6 +1337,9 @@
 					"$(SRCROOT)\..\node_modules\react-native-device-battery\ios\DeviceBattery",
 					"$(SRCROOT)\..\node_modules\react-native-fcm\ios",
 					"$(SRCROOT)\..\node_modules\react-native-linear-gradient\BVLinearGradient",
+					"$(SRCROOT)\..\node_modules\react-native-star-rating-view\Demo\StarRatingViewDemo\ios\StarRatingViewDemo",
+					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
+					"$(SRCROOT)\..\node_modules\react-native-mauron85-background-geolocation\ios\RCTBackgroundGeolocation/**",
 				);
 			};
 			name = Release;
@@ -1339,6 +1380,9 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1352,6 +1396,9 @@
 					"$(SRCROOT)\..\node_modules\react-native-device-battery\ios\DeviceBattery",
 					"$(SRCROOT)\..\node_modules\react-native-fcm\ios",
 					"$(SRCROOT)\..\node_modules\react-native-linear-gradient\BVLinearGradient",
+					"$(SRCROOT)\..\node_modules\react-native-star-rating-view\Demo\StarRatingViewDemo\ios\StarRatingViewDemo",
+					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
+					"$(SRCROOT)\..\node_modules\react-native-mauron85-background-geolocation\ios\RCTBackgroundGeolocation/**",
 				);
 			};
 			name = Debug;
@@ -1392,6 +1439,9 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1405,6 +1455,9 @@
 					"$(SRCROOT)\..\node_modules\react-native-device-battery\ios\DeviceBattery",
 					"$(SRCROOT)\..\node_modules\react-native-fcm\ios",
 					"$(SRCROOT)\..\node_modules\react-native-linear-gradient\BVLinearGradient",
+					"$(SRCROOT)\..\node_modules\react-native-star-rating-view\Demo\StarRatingViewDemo\ios\StarRatingViewDemo",
+					"$(SRCROOT)\..\node_modules\react-native-vector-icons\RNVectorIconsManager",
+					"$(SRCROOT)\..\node_modules\react-native-mauron85-background-geolocation\ios\RCTBackgroundGeolocation/**",
 				);
 			};
 			name = Release;
@@ -1440,6 +1493,9 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 			};
 			name = Debug;
@@ -1464,6 +1520,9 @@
 				TVOS_DEPLOYMENT_TARGET = 10.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",

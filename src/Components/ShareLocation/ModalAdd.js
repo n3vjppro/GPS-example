@@ -26,7 +26,7 @@ export default class ModalAdd extends Component {
             },
             body: JSON.stringify({
                 UserID: userid,
-                IsParent: true,
+                IsParent: false,
                 Name: name
             }),
 
